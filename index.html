@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财晟特殊钢 · 批发价格表</title>
+<style>
+:root {
+  --bg: #f5f3f0;
+  --surface: #ffffff;
+  --surface2: #faf9f7;
+  --border: #e5e0d8;
+  --text: #2c2420;
+  --text2: #6b5e55;
+  --text3: #9b8c80;
+  --accent: #c84b1c;
+  --blue: #2a6496;
+  --teal: #1a7a6d;
+  --amber: #b8780a;
+  --purple: #6b3fa0;
+  --slate: #4a5568;
+  --green: #2d6a4f;
+  --red: #a83232;
+  --indigo: #3b4f8c;
+  --rose: #b04560;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --radius: 10px;
+  --font-base: 15px;
+  --font-lg: 17px;
+  --font-xl: 20px;
+  --font-2xl: 24px;
+  --font-3xl: 32px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1816;
+    --surface: #242220;
+    --surface2: #2a2825;
+    --border: #3a3530;
+    --text: #e8e0d8;
+    --text2: #b0a598;
+    --text3: #7a7065;
+    --accent: #e87848;
+    --blue: #5b9fd4;
+    --teal: #4db8a8;
+    --amber: #d4a030;
+    --purple: #9b6fd4;
+    --slate: #8899aa;
+    --green: #5a9a72;
+    --red: #d45858;
+    --indigo: #6b80c0;
+    --rose: #d47088;
+  }
+}
+* { box-sizing:border-box; margin:0; padding:0 }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: var(--font-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+  position: sticky; top:0; z-index:100;
+  box-shadow: var(--shadow);
+}
+.header-inner {
+  max-width: 720px; margin:0 auto;
+  display:flex; align-items:center; gap:12px;
+}
+.header h1 {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.header .sub { font-size:13px; color:var(--text3); flex:1; text-align:right; }
+
+/* Search */
+.search-wrap {
+  max-width:720px; margin:0 auto; padding:12px 16px 0;
+}
+.search-box {
+  width:100%; padding:11px 14px; font-size:var(--font-base);
+  border:1.5px solid var(--border); border-radius:10px;
+  background:var(--surface); color:var(--text);
+  outline:none; transition:border-color .2s;
+}
+.search-box:focus { border-color:var(--accent) }
+.search-box::placeholder { color:var(--text3) }
+
+/* Tabs */
+.tabs {
+  max-width:720px; margin:0 auto; padding:10px 16px 0;
+  display:flex; gap:6px; overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.tab {
+  padding:8px 16px; font-size:14px; font-weight:600;
+  border:none; border-radius:8px; cursor:pointer;
+  background:var(--surface2); color:var(--text2);
+  white-space:nowrap; transition:all .2s;
+  border:1px solid transparent;
+}
+.tab.active { background:var(--accent); color:#fff; border-color:var(--accent) }
+.tab:hover:not(.active) { background:var(--surface); color:var(--text) }
+
+/* Stats Row */
+.stats {
+  max-width:720px; margin:0 auto; padding:10px 16px 0;
+  display:flex; gap:10px; flex-wrap:wrap;
+}
+.stat {
+  flex:1; min-width:80px; padding:10px 12px; border-radius:10px;
+  background:var(--surface); border:1px solid var(--border);
+  text-align:center;
+}
+.stat-num { font-size:var(--font-2xl); font-weight:700; color:var(--accent); line-height:1.1 }
+.stat-label { font-size:12px; color:var(--text3); margin-top:2px }
+
+/* Content */
+.content { max-width:720px; margin:0 auto; padding:10px 16px 40px; }
+.sheet { display:none }
+.sheet.active { display:block }
+
+/* Category card */
+.cat-card {
+  background:var(--surface); border-radius:var(--radius);
+  border:1px solid var(--border); overflow:hidden;
+  margin-bottom:12px; box-shadow:var(--shadow);
+}
+.cat-header {
+  display:flex; align-items:center; gap:10px;
+  padding:13px 14px; cursor:pointer;
+  user-select:none; -webkit-tap-highlight-color:transparent;
+  border-bottom:1px solid transparent;
+  transition:background .15s;
+}
+.cat-header:hover { background:var(--surface2) }
+.cat-header.open { border-bottom-color:var(--border) }
+.cat-dot {
+  width:10px; height:10px; border-radius:50%; flex-shrink:0;
+}
+.cat-name { font-size:var(--font-lg); font-weight:600; flex:1 }
+.cat-count { font-size:13px; color:var(--text3); background:var(--surface2); padding:2px 8px; border-radius:10px }
+.cat-arrow { font-size:13px; color:var(--text3); transition:transform .2s }
+.cat-header.open .cat-arrow { transform:rotate(180deg) }
+.cat-body { display:none; padding:0 }
+.cat-body.open { display:block }
+
+/* Price row */
+.price-row {
+  display:flex; align-items:center; padding:9px 14px;
+  border-bottom:1px solid var(--border); gap:10px;
+  font-size:var(--font-base);
+}
+.price-row:last-child { border-bottom:none }
+.price-row .material { flex:1; min-width:0; font-weight:500; font-size:14px }
+.price-row .spec { color:var(--text2); font-size:14px; white-space:nowrap; min-width:80px; text-align:right }
+.price-row .price {
+  font-weight:700; font-size:var(--font-base);
+  min-width:80px; text-align:right; white-space:nowrap;
+}
+.price-row .price.high { color:var(--red) }
+.price-row .price.mid { color:var(--amber) }
+.price-row .price.low { color:var(--green) }
+.price-row .note { font-size:11px; color:var(--text3); min-width:40px; text-align:right; white-space:nowrap }
+
+/* Material badge */
+.badge {
+  display:inline-block; padding:2px 7px; border-radius:5px;
+  font-size:12px; font-weight:600; margin-right:6px;
+  vertical-align:middle; line-height:1.4;
+}
+.badge-carbon { background:#e3edf7; color:var(--blue) }
+.badge-quality { background:#daf0ec; color:var(--teal) }
+.badge-alloy { background:#fef0dc; color:var(--amber) }
+.badge-stainless { background:#edf0f3; color:var(--slate) }
+.badge-spring { background:#efe4f8; color:var(--purple) }
+.badge-tool { background:#fce4e4; color:var(--red) }
+.badge-hsla { background:#ddf0e4; color:var(--green) }
+.badge-nickel { background:#e4e8f4; color:var(--indigo) }
+.badge-other { background:#f8e4ec; color:var(--rose) }
+
+@media (prefers-color-scheme: dark) {
+  .badge-carbon { background:#1e3044; color:#5b9fd4 }
+  .badge-quality { background:#1a3832; color:#4db8a8 }
+  .badge-alloy { background:#3a2c14; color:#d4a030 }
+  .badge-stainless { background:#252a30; color:#8899aa }
+  .badge-spring { background:#2a1e3a; color:#9b6fd4 }
+  .badge-tool { background:#3a1e1e; color:#d45858 }
+  .badge-hsla { background:#1a3022; color:#5a9a72 }
+  .badge-nickel { background:#1e2240; color:#6b80c0 }
+  .badge-other { background:#381e28; color:#d47088 }
+}
+
+/* No results */
+.no-results {
+  text-align:center; padding:40px 16px; color:var(--text3);
+  font-size:var(--font-lg);
+}
+
+/* Section divider */
+.section-title {
+  font-size:var(--font-lg); font-weight:700;
+  padding:16px 0 8px; margin-top:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.section-title::before {
+  content:''; width:4px; height:20px; border-radius:2px;
+  background:var(--accent);
+}
+
+/* Sub-note */
+.subnote {
+  font-size:13px; color:var(--text3); padding:4px 14px 8px;
+  font-style:italic;
+}
+
+/* Contact bar */
+.contact-bar {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px 16px;
+  margin-bottom:12px; font-size:14px; color:var(--text2);
+  text-align:center; box-shadow:var(--shadow);
+}
+.contact-bar strong { color:var(--accent); font-size:var(--font-base) }
+
+/* Price tag */
+.price-tag {
+  display:inline-flex; align-items:baseline; gap:2px;
+  font-weight:700;
+}
+.price-tag .symbol { font-size:11px; font-weight:500 }
+.price-tag .value { font-size:var(--font-base) }
+.price-tag .unit { font-size:11px; font-weight:400; color:var(--text3) }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>🔩 财晟特殊钢</h1>
+    <span class="sub">2026年同行批发价格表</span>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <input type="text" class="search-box" placeholder="🔍  搜索材质 / 牌号 / 规格…" id="search" autocomplete="off">
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-sheet="0">📋 中厚板</button>
+  <button class="tab" data-sheet="1">📐 薄板</button>
+  <button class="tab" data-sheet="2">⚪ 圆棒</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="content" id="content"></div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────
+
+// Sheet 1: 中厚板价格
+const thickPlates = [
+  // 碳素结构钢 — Q235 / Q355
+  {cat:'碳素结构钢', type:'carbon', mat:'Q235 / A3 轧制板', spec:'10 / 12 / 14mm', price:'5.5', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q235 / A3 轧制板', spec:'14 — 100mm', price:'5.3', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q355 (Q345B) 轧制板', spec:'14 — 80mm', price:'5.8', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q355 (Q345B) 轧制板', spec:'85 — 100mm', price:'6.0', note:''},
+
+  // 优质碳素钢 — 20# / 35# / 45#
+  {cat:'优质碳素钢', type:'quality', mat:'20# 轧制板', spec:'10 — 12mm', price:'6.5', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'20# 轧制板', spec:'14 — 80mm', price:'6.3', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'20# 轧制板', spec:'85 — 100mm', price:'6.5', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'35# 轧制板', spec:'6 / 8 / 10mm', price:'6.5', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'35# 轧制板', spec:'12 — 60mm', price:'6.5', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'45# 轧制板', spec:'10mm', price:'4.8', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'45# 轧制板', spec:'12mm', price:'4.6', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'45# 轧制板', spec:'14 — 95mm', price:'4.0', note:''},
+
+  // 合金结构钢
+  {cat:'合金结构钢', type:'alloy', mat:'Q690D 轧制板', spec:'12mm', price:'7.8', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'Q690D 轧制板', spec:'16 — 80mm', price:'7.5', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'Q690D 轧制板', spec:'85 — 120mm', price:'7.8', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'40Cr 轧制板', spec:'10 / 12 / 14mm', price:'5.0', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'40Cr 轧制板', spec:'16 — 100mm', price:'4.8', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'42CrMo 轧制板', spec:'10 / 12 / 14mm', price:'5.8', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'42CrMo 轧制板', spec:'16 — 100mm', price:'5.5', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'65Mn 轧制板', spec:'10mm', price:'6.5', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'65Mn 轧制板', spec:'12mm', price:'5.8', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'65Mn 轧制板', spec:'14 — 60mm', price:'5.3', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'420 轧制板', spec:'10.1 — 14.1mm', price:'11.0', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'420 轧制板', spec:'16.1 — 25.3mm', price:'11.0', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'420 轧制板', spec:'30.3 — 80.3mm', price:'11.0', note:''},
+
+  // 不锈钢
+  {cat:'不锈钢', type:'stainless', mat:'440C 黑皮', spec:'8mm', price:'19.2', note:''},
+  {cat:'不锈钢', type:'stainless', mat:'440C 黑皮', spec:'10mm', price:'18.2', note:''},
+  {cat:'不锈钢', type:'stainless', mat:'440C 黑皮', spec:'12 — 14mm', price:'16.7', note:''},
+  {cat:'不锈钢', type:'stainless', mat:'440C 黑皮', spec:'14 — 65mm', price:'16.2', note:''},
+  {cat:'不锈钢', type:'stainless', mat:'440C 铣光', spec:'65 — 100mm', price:'16.2', note:''},
+  {cat:'不锈钢', type:'stainless', mat:'630 轧制板 (宽1500)', spec:'8 — 80mm', price:'23.0', note:''},
+  {cat:'不锈钢', type:'stainless', mat:'304', spec:'8 — 12mm', price:'待定', note:'未到货'},
+  {cat:'不锈钢', type:'stainless', mat:'304', spec:'14 — 80mm', price:'17.0', note:''},
+
+  // 六角棒
+  {cat:'六角棒', type:'alloy', mat:'42CrMo 六角棒 (整条)', spec:'对边17—32 × 4m', price:'9.3', note:'整条'},
+  {cat:'六角棒', type:'alloy', mat:'42CrMo 六角棒 (零切)', spec:'对边17—32 × 4m', price:'9.8', note:'零切'},
+
+  // 高低碳钢模块区
+  {cat:'高低碳钢模块', type:'carbon', mat:'Q235 模胚', spec:'230×240', price:'5.0', note:''},
+  {cat:'高低碳钢模块', type:'carbon', mat:'Q235 模胚', spec:'370×510', price:'5.0', note:''},
+  {cat:'高低碳钢模块', type:'carbon', mat:'Q355 / 16Mn 模胚', spec:'235×240 / 320×360', price:'5.5', note:''},
+  {cat:'高低碳钢模块', type:'carbon', mat:'Q355 / 16Mn 模胚', spec:'370×510', price:'5.5', note:''},
+  {cat:'高低碳钢模块', type:'quality', mat:'10# 模胚', spec:'170×190 — 340×430', price:'6.3', note:''},
+  {cat:'高低碳钢模块', type:'quality', mat:'20# 模胚', spec:'225×240 / 370×510', price:'6.0', note:''},
+  {cat:'高低碳钢模块', type:'quality', mat:'20Mn 模胚', spec:'320×420', price:'6.0', note:''},
+  {cat:'高低碳钢模块', type:'quality', mat:'35# 模胚', spec:'385×500', price:'6.5', note:''},
+  {cat:'高低碳钢模块', type:'quality', mat:'55# 模胚', spec:'235×240', price:'6.5', note:''},
+  {cat:'高低碳钢模块', type:'quality', mat:'50Mn / 50# 模胚', spec:'320×420', price:'6.5', note:''},
+  {cat:'高低碳钢模块', type:'alloy', mat:'65Mn 模胚', spec:'205×210 / 250×300 / 400×500', price:'5.0', note:''},
+  {cat:'高低碳钢模块', type:'tool', mat:'82D / T8 模胚', spec:'320×420', price:'7.0', note:''},
+  {cat:'高低碳钢模块', type:'tool', mat:'GCr9 模胚', spec:'320×420', price:'9.0', note:''},
+  {cat:'高低碳钢模块', type:'tool', mat:'GCr15 模胚', spec:'380×507', price:'9.0', note:''},
+  {cat:'高低碳钢模块', type:'tool', mat:'T10 模胚', spec:'250×300', price:'9.0', note:''},
+  {cat:'高低碳钢模块', type:'quality', mat:'35Mn 模胚', spec:'400×500', price:'6.8', note:''},
+  {cat:'高低碳钢模块', type:'quality', mat:'1214 模胚', spec:'200×200', price:'6.3', note:''},
+
+  // 合金钢模块区
+  {cat:'合金钢模块', type:'alloy', mat:'16MnCr5H', spec:'250×300', price:'8.5', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'20MnCr5H', spec:'220×220 / 315×480', price:'8.5', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'20CrMnTi', spec:'380×500', price:'8.5', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'38CrMoAl', spec:'380×490', price:'10.5', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'12Cr1MoV', spec:'340×430', price:'9.5', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'20CrMo / 20CrMoA', spec:'240×240 — 330×425', price:'8.0', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'22CrMoH', spec:'385×500', price:'8.0', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'30CrMo / 35CrMo', spec:'340×430', price:'8.0', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'42CrMo', spec:'340×430', price:'5.5', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'30CrMnSi / 30CrMnSiA', spec:'350×507', price:'10.5', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'35CrMnSiA', spec:'310×360', price:'11.8', note:''},
+  {cat:'合金钢模块', type:'spring', mat:'50CrV', spec:'305×560', price:'12.0', note:''},
+  {cat:'合金钢模块', type:'spring', mat:'60CrV', spec:'250×300', price:'11.5', note:''},
+  {cat:'合金钢模块', type:'spring', mat:'60Si2Cr', spec:'350×560', price:'11.5', note:''},
+  {cat:'合金钢模块', type:'spring', mat:'60Si2CrV', spec:'210×210', price:'11.5', note:''},
+  {cat:'合金钢模块', type:'spring', mat:'60Si2Mn', spec:'250×300', price:'11.5', note:''},
+  {cat:'合金钢模块', type:'alloy', mat:'20Cr', spec:'220×220', price:'9.0', note:''},
+  {cat:'合金钢模块', type:'tool', mat:'5CrMnMo', spec:'250×370', price:'17.0', note:''},
+
+  // 镍钢模块区
+  {cat:'镍钢模块', type:'nickel', mat:'18CrNiMo7-6', spec:'250×370', price:'15.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'20CrNiMo / 8620H', spec:'380×505', price:'13.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'SAE8620H', spec:'280×280', price:'—', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'20CrNi2Mo', spec:'250×370', price:'18.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'20Cr2Ni4A', spec:'250×370', price:'20.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'30CrNiMo8 / 30Cr2Ni2Mo', spec:'250×370', price:'20.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'30CrMnSiNi2', spec:'250×300', price:'20.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'34CrNiMo6', spec:'250×370', price:'18.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'34CrNi3Mo', spec:'250×370', price:'20.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'4330V', spec:'250×300', price:'19.8', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'4340 / 40CrNi2MoA', spec:'365×510', price:'13.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'45CrNiMoV / D6AC', spec:'250×370', price:'17.0', note:''},
+  {cat:'镍钢模块', type:'nickel', mat:'5CrNiMo', spec:'285×670', price:'18.0', note:''},
+  {cat:'镍钢模块', type:'stainless', mat:'1Cr13 / 410 锻料', spec:'250×370', price:'11.5', note:''},
+  {cat:'镍钢模块', type:'stainless', mat:'2Cr13 / 420J1 锻料', spec:'250×370', price:'11.5', note:''},
+  {cat:'镍钢模块', type:'stainless', mat:'3Cr13 / 420J2 锻料', spec:'250×370', price:'11.5', note:''},
+  {cat:'镍钢模块', type:'stainless', mat:'4Cr13 锻料', spec:'250×370', price:'11.5', note:''},
+  {cat:'镍钢模块', type:'stainless', mat:'630 锻打料', spec:'200—400 × 410 × L', price:'23.0', note:''},
+];
+
+// Sheet 2: 薄板价格 — organized by subcategory
+const thinPlates = [
+  // A3冷轧板 SPCC/DC01
+  {cat:'A3冷轧板', type:'quality', mat:'SPCC / DC01 A3冷轧', spec:'0.13 × 610 × 1000', price:'10.0', note:'整板'},
+  {cat:'A3冷轧板', type:'quality', mat:'SPCC / DC01 A3冷轧', spec:'0.2 × 610 × 1000', price:'10.0', note:'整板'},
+  {cat:'A3冷轧板', type:'quality', mat:'A3冷轧板', spec:'0.3 × 1000 × 2000', price:'7.2 / 7.7 / 8.4', note:'整/一刀/零'},
+  {cat:'A3冷轧板', type:'quality', mat:'A3冷轧板', spec:'0.4 × 1000 × 2000', price:'7.2 / 7.7 / 8.2', note:'整/一刀/零'},
+  {cat:'A3冷轧板', type:'quality', mat:'A3冷轧板', spec:'0.5 小板 × 1000 × 2000', price:'6.2 / 6.7 / 7.2', note:'整/一刀/零'},
+  {cat:'A3冷轧板', type:'quality', mat:'A3冷轧板', spec:'0.5 大板 × 1250 × 2500', price:'6.0 / 6.5 / 7.0', note:'整/一刀/零'},
+  {cat:'A3冷轧板', type:'quality', mat:'A3冷轧板', spec:'0.6 — 0.8 × 1000×2000', price:'6.0 / 6.5 / 7.0', note:'整/一刀/零'},
+  {cat:'A3冷轧板', type:'quality', mat:'A3冷轧板', spec:'0.8 大板 × 1250 × 2500', price:'6.0 / 6.5 / 7.0', note:'整/一刀/零'},
+  {cat:'A3冷轧板', type:'quality', mat:'A3冷轧板', spec:'1.0 小板 × 1000 × 2000', price:'5.0 / 5.8 / 6.3', note:'整/一刀/零'},
+  {cat:'A3冷轧板', type:'quality', mat:'A3冷轧板', spec:'1.0 — 2.3 × 1250 × 2500', price:'5.0 / 5.8 / 6.3', note:'整/一刀/零'},
+  {cat:'A3冷轧板', type:'quality', mat:'鞍钢 A3冷轧', spec:'2.5 — 3.0 × 1250 × 2500', price:'5.0—5.5', note:'整板'},
+  {cat:'A3冷轧板', type:'carbon', mat:'Q235 冷板', spec:'3.5 — 6.0 × 1250 × 2500', price:'7.2 / 8.5', note:'整/一刀 到货'},
+  {cat:'A3冷轧板', type:'quality', mat:'08AL 冷板', spec:'6 × 1250 × 2500', price:'7.2 / 8.5', note:'整/一刀 到货'},
+
+  // A3热轧板
+  {cat:'A3热轧板', type:'carbon', mat:'Q235 / Q235B 热轧', spec:'1.8 — 2.5 × 1250×2500', price:'5.2 / 5.7 / 6.2', note:'整/一刀/零'},
+  {cat:'A3热轧板', type:'carbon', mat:'Q235B 热轧', spec:'3.0 — 12 × 1260—1510', price:'4.5 / 5.0 / 5.5', note:'整/一刀/零'},
+
+  // 酸洗板
+  {cat:'酸洗板', type:'quality', mat:'SPHC 酸洗', spec:'2.5 — 8 × 1260×2500', price:'4.6 / 5.0 / 6.0', note:'整/一刀/零'},
+  {cat:'酸洗板', type:'quality', mat:'SPHC 酸洗', spec:'8 — 12 × 1510×3000', price:'4.6—5.5', note:''},
+
+  // 45#冷板/热板
+  {cat:'45#冷板/热板', type:'quality', mat:'45# 冷板', spec:'0.8 — 3.0 × 1250×2500', price:'6.5—7.5', note:'整/一刀/零'},
+  {cat:'45#冷板/热板', type:'quality', mat:'45# 冷板', spec:'3.5 — 6.0 × 1250×2500', price:'8.0 / 9.5', note:'整/一刀'},
+  {cat:'45#冷板/热板', type:'quality', mat:'45# 热轧板', spec:'2.0 — 10 × 1260×2500', price:'5.0—6.0', note:''},
+
+  // 65Mn弹簧钢
+  {cat:'65Mn弹簧钢', type:'spring', mat:'65Mn 冷轧', spec:'1.0 — 3.0 × 1250×2500', price:'6.5—7.8', note:'整/一刀/零'},
+  {cat:'65Mn弹簧钢', type:'spring', mat:'65Mn 热轧', spec:'2.0 — 12 × 1260×2500', price:'5.8—7.0', note:'整/一刀/零'},
+
+  // DC系列深冲板
+  {cat:'DC深冲板', type:'hsla', mat:'DC04 / DC05 / DC06', spec:'0.4 — 3.0 × 1000—1250', price:'6.5—9.2', note:''},
+
+  // Q345/S355
+  {cat:'Q345 / S355 热轧', type:'carbon', mat:'S355 热轧板', spec:'2.0 — 12 × 1510×3000', price:'6.0—8.0', note:''},
+
+  // SK85工具钢
+  {cat:'SK85工具钢', type:'tool', mat:'SK85 冷板/热板', spec:'1.0 — 10 × 1260×2500', price:'8.5 / 10.5', note:'整/一刀'},
+
+  // 60Si2Mn
+  {cat:'60Si2Mn弹簧钢', type:'spring', mat:'60Si2MnA 冷板', spec:'1.0 — 2.5 × 1100×2500', price:'9.5 / 10.5', note:'整/一刀 新品'},
+  {cat:'60Si2Mn弹簧钢', type:'spring', mat:'60Si2MnA 热板', spec:'3.0 — 10 × 1260—1510', price:'8.0 / 10.0', note:'整/一刀'},
+  {cat:'60Si2Mn弹簧钢', type:'spring', mat:'60Si2Mn 硬料', spec:'2.5 × 160 × 2020', price:'13.0', note:'HRC45-50'},
+
+  // 50CrV
+  {cat:'50CrV', type:'spring', mat:'50CrV 冷轧板', spec:'2.0 × 1250 × 2500', price:'10.5 / 11.5', note:'整/一刀'},
+  {cat:'50CrV', type:'spring', mat:'50CrV 热轧板', spec:'3.0 — 8.0 × 1250×2500', price:'10.5 / 11.5', note:'整/一刀 新品'},
+
+  // HC系列高强钢
+  {cat:'HC高强钢', type:'hsla', mat:'HC340LA', spec:'0.8 — 3.0 × 1170—1270', price:'7.0 / 8.0', note:'整/一刀'},
+  {cat:'HC高强钢', type:'hsla', mat:'HC420LA / QST系列', spec:'3.0 — 8.0 × 1220—1370', price:'7.0—8.0', note:''},
+  {cat:'HC高强钢', type:'hsla', mat:'HC420/780DP 冷板', spec:'0.8 — 2.5 × 1210—1395', price:'7.5 / 8.5', note:'整/一刀'},
+  {cat:'HC高强钢', type:'hsla', mat:'HC700/980DP 冷板', spec:'0.8 — 2.0 × 1225—1377', price:'8.5 / 9.3', note:'整/一刀'},
+  {cat:'HC高强钢', type:'hsla', mat:'HC420/780DP+Z 镀锌', spec:'0.8 — 2.0 × 1200—1500', price:'8.5 / 9.5', note:'整/一刀'},
+
+  // 42CrMo / 40Cr 热板
+  {cat:'42CrMo / 40Cr 热板', type:'alloy', mat:'42CrMo 热板', spec:'3.0 — 8.0 × 1260×3000', price:'8.0 / 9.5', note:'整/一刀'},
+  {cat:'42CrMo / 40Cr 热板', type:'alloy', mat:'40Cr 热轧板', spec:'3.0 — 6.0 × 1260×4000', price:'7.5 / 8.5', note:'整/一刀 新品'},
+
+  // 10#冷板/热板
+  {cat:'10#冷板/热板', type:'quality', mat:'10# 冷板', spec:'0.6 — 6.0 × 1250×2500', price:'7.0—10.5', note:''},
+  {cat:'10#冷板/热板', type:'quality', mat:'10# 热板', spec:'3.0 — 12 × 1250×2500', price:'6.5 / 7.0', note:'整/一刀'},
+
+  // 20#冷板/热板
+  {cat:'20#冷板/热板', type:'quality', mat:'20# 冷板', spec:'0.6 — 6.0 × 1250×2500', price:'6.5—10.5', note:''},
+  {cat:'20#冷板/热板', type:'quality', mat:'20# 热板', spec:'3.0 — 10 × 1250×2500', price:'6.5 / 7.0', note:'整/一刀'},
+
+  // 不锈钢薄板
+  {cat:'不锈钢 — 321', type:'stainless', mat:'321 / 2B', spec:'0.5 — 3.0 × 1220×2440', price:'24—27', note:''},
+  {cat:'不锈钢 — 321', type:'stainless', mat:'321 工业面 (酸洗)', spec:'4.0 — 6.0 × 1500×3000', price:'25 / 27.5', note:'整/一刀'},
+  {cat:'不锈钢 — 304L', type:'stainless', mat:'304L / 2B', spec:'0.5 — 3.0 × 1220×2440', price:'21—23', note:''},
+  {cat:'不锈钢 — 310S', type:'stainless', mat:'310S / 2B', spec:'0.5 — 3.0 × 1220×2440', price:'52 / 55', note:'整/一刀'},
+  {cat:'不锈钢 — 310S', type:'stainless', mat:'310S 工业面', spec:'4.0 — 6.0 × 1500×3000', price:'53 / 55', note:'整/一刀'},
+  {cat:'不锈钢 — 316Ti', type:'stainless', mat:'316Ti / 2B', spec:'0.8 — 3.0 × 1220—1500', price:'48 / 53', note:'整/一刀'},
+  {cat:'不锈钢 — 316Ti', type:'stainless', mat:'316Ti 工业面', spec:'4.0 — 6.0 × 1500×3000', price:'42 / 45', note:'整/一刀'},
+  {cat:'不锈钢 — 420J2', type:'stainless', mat:'420J2 / 2B', spec:'0.8 — 3.0 × 1265×2440', price:'12 / 13 / 14', note:'整/一刀/零 新品'},
+  {cat:'不锈钢 — 430', type:'stainless', mat:'430 / 2B', spec:'0.4 — 3.0 × 1220×2440', price:'10 / 11 / 12', note:'整/一刀/零 新品'},
+
+  // 35#薄板
+  {cat:'35#薄板', type:'quality', mat:'35# 冷板', spec:'1.0 — 2.0 × 950—1250', price:'8.5 / 9.0', note:''},
+
+  // Q550D/Q460C
+  {cat:'Q550D / Q460C 热板', type:'hsla', mat:'Q550D 热板', spec:'3.0 — 10 × 1510×3000', price:'8.0 / 8.5', note:'整/一刀'},
+  {cat:'Q550D / Q460C 热板', type:'hsla', mat:'Q460C 热板', spec:'2.5 — 10 × 1485—1510', price:'7.5 / 8.0', note:'整/一刀'},
+
+  // 420J2不锈铁卷带
+  {cat:'420J2 不锈铁卷带', type:'stainless', mat:'420J2 卷带', spec:'0.1 — 0.8 × C', price:'22—30', note:'按规格'},
+];
+
+// Sheet 3: 圆棒
+const roundBars = [
+  {cat:'碳素结构钢', type:'carbon', mat:'Q235B', spec:'Φ16 — Φ45', price:'5.5', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q235B', spec:'Φ50 — Φ95', price:'5.6', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q235B', spec:'Φ100 — Φ130', price:'5.7', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q235B', spec:'Φ140 — Φ220', price:'5.8', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q235B', spec:'Φ230 — Φ320', price:'6.5', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q355B / Q345B', spec:'Φ16 — Φ18', price:'6.0', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q355B / Q345B', spec:'Φ20 — Φ95', price:'5.8', note:''},
+  {cat:'碳素结构钢', type:'carbon', mat:'Q355B / Q345B', spec:'Φ230 — Φ380', price:'6.5—8.5', note:''},
+
+  {cat:'优质碳素钢', type:'quality', mat:'10#', spec:'Φ16 — Φ18', price:'7.2', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'10#', spec:'Φ20 — Φ160', price:'6.6', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'10#', spec:'Φ170 — Φ200', price:'6.8', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'20#', spec:'Φ16 — Φ18', price:'6.0', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'20#', spec:'Φ20 — Φ130', price:'5.5', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'20#', spec:'Φ140 — Φ320', price:'5.8—6.5', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'35#', spec:'Φ16 — Φ320', price:'5.8—6.5', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'45#', spec:'Φ16 — Φ18', price:'4.0', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'45#', spec:'Φ20 — Φ130', price:'4.3', note:''},
+  {cat:'优质碳素钢', type:'quality', mat:'45#', spec:'Φ230 — Φ530', price:'4.9—6.8', note:''},
+
+  {cat:'合金结构钢', type:'alloy', mat:'40Cr', spec:'Φ16 — Φ500', price:'4.6—7.0', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'42CrMo', spec:'Φ14 — Φ500', price:'6.0—7.5', note:''},
+  {cat:'合金结构钢', type:'alloy', mat:'30CrMnSiA', spec:'Φ14 — Φ240', price:'7.0—9.0', note:''},
+
+  {cat:'镍铬钢', type:'nickel', mat:'SAE8620H / 20CrNiMoA', spec:'Φ14 — Φ200', price:'8.5—10', note:''},
+];
+
+// ─── RENDER ────────────────────────────────────────
+
+const sheets = [thickPlates, thinPlates, roundBars];
+let currentSheet = 0;
+let searchTerm = '';
+
+function categoryBadge(type) {
+  const map = {
+    carbon: 'badge-carbon',
+    quality: 'badge-quality',
+    alloy: 'badge-alloy',
+    stainless: 'badge-stainless',
+    spring: 'badge-spring',
+    tool: 'badge-tool',
+    hsla: 'badge-hsla',
+    nickel: 'badge-nickel',
+    other: 'badge-other',
+  };
+  const labels = {
+    carbon: '碳素',
+    quality: '优质碳素',
+    alloy: '合金',
+    stainless: '不锈钢',
+    spring: '弹簧钢',
+    tool: '工具钢',
+    hsla: '高强钢',
+    nickel: '镍钢',
+    other: '其他',
+  };
+  return `<span class="badge ${map[type]||'badge-other'}">${labels[type]||type}</span>`;
+}
+
+function priceClass(priceStr) {
+  const n = parseFloat(priceStr);
+  if (isNaN(n)) return '';
+  if (n >= 15) return 'high';
+  if (n >= 8) return 'mid';
+  return 'low';
+}
+
+function formatPrice(p) {
+  if (!p || p === '—' || p === '待定') return p;
+  return `<span class="price-tag"><span class="symbol">¥</span><span class="value">${p}</span><span class="unit">/kg</span></span>`;
+}
+
+function renderStats(items) {
+  const prices = items.map(i=>parseFloat(i.price)).filter(n=>!isNaN(n));
+  if (!prices.length) return '';
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const avg = (prices.reduce((a,b)=>a+b,0) / prices.length).toFixed(1);
+  const cats = new Set(items.map(i=>i.cat)).size;
+  return `
+    <div class="stat"><div class="stat-num">${items.length}</div><div class="stat-label">条目</div></div>
+    <div class="stat"><div class="stat-num">${cats}</div><div class="stat-label">分类</div></div>
+    <div class="stat"><div class="stat-num">¥${min}</div><div class="stat-label">最低价/kg</div></div>
+    <div class="stat"><div class="stat-num">¥${max}</div><div class="stat-label">最高价/kg</div></div>
+    <div class="stat"><div class="stat-num">¥${avg}</div><div class="stat-label">均价/kg</div></div>
+  `;
+}
+
+function renderSheet(items) {
+  if (!items.length) return '<div class="no-results">未找到匹配项</div>';
+
+  // Group by category
+  const groups = {};
+  items.forEach(item => {
+    if (!groups[item.cat]) groups[item.cat] = [];
+    groups[item.cat].push(item);
+  });
+
+  let html = '';
+  for (const [cat, rows] of Object.entries(groups)) {
+    const type = rows[0].type;
+    html += '<div class="cat-card">';
+    html += `<div class="cat-header open" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">`;
+    html += `<div class="cat-dot" style="background:${getDotColor(type)}"></div>`;
+    html += `<span class="cat-name">${cat}</span>`;
+    html += `<span class="cat-count">${rows.length}项</span>`;
+    html += `<span class="cat-arrow">▼</span>`;
+    html += '</div>';
+    html += '<div class="cat-body open">';
+
+    // Sub-header for thin plates with size columns
+    rows.forEach(row => {
+      const pc = priceClass(row.price);
+      html += `<div class="price-row">`;
+      html += `<span class="material">${categoryBadge(row.type)}${row.mat}</span>`;
+      html += `<span class="spec">${row.spec}</span>`;
+      html += `<span class="price ${pc}">${formatPrice(row.price)}</span>`;
+      if (row.note) html += `<span class="note">${row.note}</span>`;
+      html += '</div>';
+    });
+
+    html += '</div></div>';
+  }
+  return html;
+}
+
+function getDotColor(type) {
+  const style = getComputedStyle(document.documentElement);
+  const map = {
+    carbon: style.getPropertyValue('--blue').trim(),
+    quality: style.getPropertyValue('--teal').trim(),
+    alloy: style.getPropertyValue('--amber').trim(),
+    stainless: style.getPropertyValue('--slate').trim(),
+    spring: style.getPropertyValue('--purple').trim(),
+    tool: style.getPropertyValue('--red').trim(),
+    hsla: style.getPropertyValue('--green').trim(),
+    nickel: style.getPropertyValue('--indigo').trim(),
+    other: style.getPropertyValue('--rose').trim(),
+  };
+  return map[type] || map.other;
+}
+
+function filterItems(items, term) {
+  if (!term) return items;
+  const t = term.toLowerCase();
+  return items.filter(i =>
+    i.cat.toLowerCase().includes(t) ||
+    i.mat.toLowerCase().includes(t) ||
+    i.spec.toLowerCase().includes(t) ||
+    i.price.toLowerCase().includes(t) ||
+    i.note.toLowerCase().includes(t)
+  );
+}
+
+function updateDisplay() {
+  const items = filterItems(sheets[currentSheet], searchTerm);
+  document.getElementById('stats').innerHTML = renderStats(items);
+  document.getElementById('content').innerHTML = renderSheet(items);
+}
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    currentSheet = parseInt(tab.dataset.sheet);
+    updateDisplay();
+  });
+});
+
+// Search
+document.getElementById('search').addEventListener('input', (e) => {
+  searchTerm = e.target.value;
+  updateDisplay();
+});
+
+// Initial render
+updateDisplay();
+
+// Add contact info
+const contactHTML = `
+<div style="max-width:720px;margin:4px auto 0;padding:0 16px;">
+  <div class="contact-bar">
+    📞 <strong>接单：</strong>凌小姐 153-7770-9780 &nbsp;|&nbsp; 李小姐 133-2685-2517 &nbsp;|&nbsp;
+    <strong>投诉咨询：</strong>方生 15322822777（微信同步）
+  </div>
+  <div style="font-size:13px;color:var(--text3);text-align:center;padding:6px 0 16px;">
+    ⚠️ 以上材料单价均不含税 &nbsp; 含税 ÷ 0.9 &nbsp;|&nbsp; 交期急单请与开单协商 &nbsp;|&nbsp; 毛料可理算：厚度+3/+5，长宽+5
+  </div>
+</div>`;
+document.getElementById('content').insertAdjacentHTML('afterend', contactHTML);
+</script>
+
+</body>
+</html>
