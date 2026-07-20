@@ -304,38 +304,6 @@ cutFee:[
 {cat:'圆棒切口费标准',type:'other',mat:'Φ410 — Φ500',spec:'范围内',price:'—',fee:'30/件',note:''},
 ]};
 
-
-// Supabase fetch (background sync)
-const SB_URL='https://kkmyrpfbkeflfhyynckm.supabase.co';
-const SB_KEY='sb_publishable_1272s6gsC1zMBi6ncyGIeQ_n4TCJvLM';
-const STAB={thick:'thick',thin:'thin',bar:'bar',cutFee:'cutfee'};
-function sf(path,opts={}){
-  const h={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
-  return fetch(SB_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:h,body:opts.body?JSON.stringify(opts.body):undefined})
-    .then(r=>r.ok?r.json():Promise.reject(r.status));
-}
-async function syncDB(){
-  try{
-    const r=await sf('thick?select=id&limit=1');
-    if(Array.isArray(r)&&r.length===0){
-      for(const [k,items] of Object.entries(INIT)){
-        if(!items.length) continue;
-        const batch=items.map(x=>{const o={...x};delete o.id;return o;});
-        await sf(STAB[k],{method:'POST',body:batch});
-      }
-    }
-    for(const k of KEYS){
-      try{const rows=await sf(STAB[k]+'?select=*&order=sort_order');if(rows&&rows.length)data[k]=rows;}catch(e){}
-    }
-    save();render();toast('已同步云端');
-  }catch(e){console.log('Supabase:',e.message||e);}
-}
-async function dbCRUD(k,action,item,id){
-  try{
-    if(action==='save'){const x={...item};delete x.id;if(id)await sf(STAB[k]+'?id=eq.'+id,{method:'PATCH',body:x});else await sf(STAB[k],{method:'POST',body:x});}
-    else if(action==='del') await sf(STAB[k]+'?id=eq.'+id,{method:'DELETE'});
-  }catch(e){console.log('DB sync err:',e.message||e);}
-}
 const KEYS=['thick','thin','bar','cutFee'], TABS=['中厚板','薄板','圆棒','切口费标准'];
 
 let data=JSON.parse(JSON.stringify(INIT));
