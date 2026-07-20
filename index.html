@@ -140,7 +140,7 @@ td:last-child { border-right:none }
 @media (prefers-color-scheme:dark) { .toast{background:#555} }
 .no-r { text-align:center; padding:40px; color:var(--t3) }
 </style>
-</head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script></head>
 <body>
 
 <div class="header">
@@ -304,11 +304,60 @@ cutFee:[
 {cat:'圆棒切口费标准',type:'other',mat:'Φ410 — Φ500',spec:'范围内',price:'—',fee:'30/件',note:''},
 ]};
 
+
+// Supabase
+const SB_URL='https://kkmyrpfbkeflfhyynckm.supabase.co';
+const SB_KEY='sb_publishable_1272s6gsC1zMBi6ncyGIeQ_n4TCJvLM';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const TABLES={thick:'thick',thin:'thin',bar:'bar',cutFee:'cutfee'};
+
+// Check if Supabase is reachable, fall back to localStorage
+let useDB=true;
+async function initData(){
+  try{
+    const {error}=await sb.from('thick').select('id',{count:'exact',head:true});
+    if(error) throw error;
+    // Seed if empty
+    const {count}=await sb.from('thick').select('*',{count:'exact',head:true});
+    if(count===0){
+      for(const [key,items] of Object.entries(INIT)){
+        if(!items.length) continue;
+        const batch=items.map(r=>{const x={...r};delete x.id;if(key==='thin'&&x.oneCut!==undefined){x.onecut=x.oneCut;delete x.oneCut;}return x;});
+        await sb.from(TABLES[key]).insert(batch);
+      }
+    }
+    await loadFromDB();
+  }catch(e){
+    useDB=false;
+    loadFromLocal();
+  }
+  initData();
+}
+
+async function loadFromDB(){
+  for(const key of KEYS){
+    const {data:rows}=await sb.from(TABLES[key]).select('*').order('sort_order');
+    if(rows){data[key]=rows.map(r=>{if(key==='thin'&&r.onecut!==undefined){r.oneCut=r.onecut;delete r.onecut;}return r;});}
+  }
+}
+
+function loadFromLocal(){
+  try{const v=localStorage.getItem('sp');if(v)data=JSON.parse(v);else data=JSON.parse(JSON.stringify(INIT));}
+  catch(e){data=JSON.parse(JSON.stringify(INIT));}
+}
+
+async function dbSave(key,item,id){
+  if(!useDB) return;
+  const row={...item};delete row.id;delete row.origin;if(key==='thin'&&row.oneCut!==undefined){row.onecut=row.oneCut;delete row.oneCut;}
+  if(id) await sb.from(TABLES[key]).update(row).eq('id',id);
+  else await sb.from(TABLES[key]).insert(row);
+}
+async function dbDel(key,id){if(useDB) await sb.from(TABLES[key]).delete().eq('id',id);}
 const KEYS=['thick','thin','bar','cutFee'], TABS=['中厚板','薄板','圆棒','切口费标准'];
 
-let data=JSON.parse(JSON.stringify(INIT));
-try{ const v=localStorage.getItem('sp'); if(v) data=JSON.parse(v); }catch(e){}
-function save(){ localStorage.setItem('sp',JSON.stringify(data)); }
+let data={thick:[],thin:[],bar:[],cutFee:[]};
+
+function save(){ localStorage.setItem('sp',JSON.stringify(data)); } // local backup
 
 let cur=0, q='', admin=false;
 
