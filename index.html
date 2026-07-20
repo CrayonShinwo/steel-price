@@ -56,11 +56,6 @@ body {
 .tab { padding:8px 15px; font-size:var(--fs); font-weight:600; border:none; border-radius:8px; cursor:pointer; background:var(--card2); color:var(--t2); white-space:nowrap; font-family:inherit }
 .tab.active { background:var(--accent); color:#fff }
 
-.stats { max-width:780px; margin:0 auto; padding:8px 16px 0; display:flex; gap:8px; flex-wrap:wrap }
-.stat { flex:1; min-width:70px; padding:9px 8px; border-radius:8px; background:var(--card); border:1px solid var(--b); text-align:center }
-.stat .n { font-size:var(--fx); font-weight:700; color:var(--accent); line-height:1.2 }
-.stat .l { font-size:11px; color:var(--t3) }
-
 .content { max-width:780px; margin:0 auto; padding:8px 16px 40px }
 
 /* Category */
@@ -78,27 +73,28 @@ body {
 
 /* Table */
 .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch }
-table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:520px }
-th { font-size:var(--fs); color:var(--t3); font-weight:600; text-align:left; padding:7px 10px; border-bottom:2px solid var(--b); background:var(--card2); white-space:nowrap }
-td { padding:9px 10px; border-bottom:1px solid var(--b); font-size:var(--fm); vertical-align:middle }
+table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:560px }
+th { font-size:var(--fs); color:var(--t3); font-weight:600; text-align:left; padding:7px 8px; border-bottom:2px solid var(--b); background:var(--card2); white-space:nowrap }
+td { padding:9px 8px; border-bottom:1px solid var(--b); font-size:var(--fm); vertical-align:middle; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
 tr:last-child td { border-bottom:none }
 tr:nth-child(even) td { background:var(--card2) }
 
-.col-mat { width:28% }
-.col-spec { width:24% }
-.col-price { width:16%; text-align:right }
-.col-fee { width:14%; text-align:center }
-.col-note { width:18%; text-align:right }
-.col-act { width:60px; text-align:right }
+.col-mat { width:150px }
+.col-spec { width:150px }
+.col-price { width:80px; text-align:right }
+.col-fee { width:75px; text-align:center }
+.col-note { width:105px; text-align:right }
+.col-act { width:60px; text-align:center }
 
 td.mat { font-weight:600 }
 td.spec { color:var(--t2); font-size:var(--fs) }
-td.price { font-weight:700; text-align:right; white-space:nowrap }
+td.price { font-weight:700; text-align:right }
 td.price.hi { color:var(--red) }
 td.price.mi { color:var(--amber) }
 td.price.lo { color:var(--green) }
-td.fee { text-align:center; white-space:nowrap; color:var(--t2); font-size:var(--fs) }
-td.note { text-align:right; white-space:nowrap; color:var(--t3); font-size:var(--fs) }
+td.fee { text-align:center; color:var(--t2); font-size:var(--fs) }
+td.note { text-align:right; color:var(--t3); font-size:var(--fs) }
+td.act { text-align:center }
 
 /* Badge */
 .badge { display:inline-block; padding:1px 6px; border-radius:4px; font-size:11px; font-weight:600; margin-right:3px }
@@ -168,7 +164,6 @@ td.note { text-align:right; white-space:nowrap; color:var(--t3); font-size:var(-
 </div>
 
 <div class="tabs" id="tabs"></div>
-<div class="stats" id="stats"></div>
 <div class="content" id="content"></div>
 <div class="footer" id="footer"></div>
 
@@ -452,11 +447,6 @@ function render(){
   const key=KEYS[cur]; let items=data[key];
   if(q){ const t=q.toLowerCase(); items=items.filter(i=>Object.values(i).some(v=>String(v).toLowerCase().includes(t))); }
   const showFee=key!=='cutFee'&&document.getElementById('chkFee')?.checked;
-  const ps=items.map(i=>parseFloat(i.price)).filter(n=>!isNaN(n));
-
-  document.getElementById('stats').innerHTML=ps.length
-    ? ['条目:'+items.length,'分类:'+new Set(items.map(i=>i.cat)).size,'最低 ¥'+Math.min(...ps).toFixed(1),'最高 ¥'+Math.max(...ps).toFixed(1),'均价 ¥'+(ps.reduce((a,b)=>a+b,0)/ps.length).toFixed(1)].map(s=>{ const p=s.split(' '); return '<div class="stat"><div class="n">'+p[1]+'</div><div class="l">'+p[0]+'</div></div>'; }).join('')
-    : '';
 
   document.getElementById('tabs').innerHTML=TABS.map((t,i)=>'<button class="tab'+(i===cur?' active':'')+'" data-i="'+i+'">'+t+'</button>').join('');
 
