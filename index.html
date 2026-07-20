@@ -327,7 +327,7 @@ async function syncDB(){
     for(const k of KEYS){
       try{const rows=await sf(STAB[k]+'?select=*&order=sort_order');if(rows&&rows.length)data[k]=rows;}catch(e){}
     }
-    save();render();syncDB();toast('已同步云端');
+    save();render();toast('已同步云端');
   }catch(e){console.log('Supabase:',e.message||e);}
 }
 async function dbCRUD(k,action,item,id){
