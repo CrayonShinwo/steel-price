@@ -495,6 +495,7 @@ function badge(type) {
 function priceCls(p) { const n=parseFloat(p); if(isNaN(n)) return ''; if(n>=15) return 'high'; if(n>=8) return 'mid'; return 'low'; }
 
 function renderStats(items) {
+  // 取第一个有效数字（处理 "5.0/5.8/6.3" 和 "6.5-7.5" 格式）
   const ps = items.map(i=>parseFloat(i.price)).filter(n=>!isNaN(n));
   if(!ps.length) return '';
   return ['条目:'+items.length, '分类:'+new Set(items.map(i=>i.cat)).size,
@@ -523,7 +524,7 @@ function renderSheet(items, key) {
     html += '</tr>';
 
     rows.forEach((r,i) => {
-      const idx = items.indexOf(r);
+      const idx = data[key].indexOf(r);  // 原始数组索引，避免搜索过滤后错位
       html += `<tr>
         <td class="mat">${badge(r.type)}${r.mat}</td>
         <td class="spec">${r.spec}</td>
