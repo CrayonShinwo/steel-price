@@ -74,7 +74,7 @@ body {
 /* Table */
 .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch }
 table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:670px }
-th { font-size:var(--fs); color:var(--t3); font-weight:600; text-align:left; padding:7px 8px; border-bottom:2px solid var(--b); background:var(--card2); white-space:nowrap }
+th { font-size:var(--fs); color:var(--t3); font-weight:600; text-align:center; padding:7px 8px; border-bottom:2px solid var(--b); background:var(--card2); white-space:nowrap }
 td { padding:9px 8px; border-bottom:1px solid var(--b); font-size:var(--fm); vertical-align:middle }
 
 tr:last-child td { border-bottom:none }
@@ -82,21 +82,21 @@ tr:nth-child(even) td { background:var(--card2) }
 
 .col-mat { width:180px }
 .col-spec { width:170px }
-.col-price { width:90px; text-align:right }
-.col-price2 { width:80px; text-align:right }
-.col-price3 { width:80px; text-align:right }
+.col-price { width:90px; text-align:center }
+.col-price2 { width:80px; text-align:center }
+.col-price3 { width:80px; text-align:center }
 .col-fee { width:75px; text-align:center }
-.col-note { width:90px; text-align:right }
+.col-note { width:90px; text-align:center }
 .col-act { width:60px; text-align:center }
 
-td.mat { font-weight:600; word-break:break-all }
-td.spec { color:var(--t2); font-size:var(--fs) }
-td.price { font-weight:700; text-align:right }
+td.mat { font-weight:600; word-break:break-all; text-align:center }
+td.spec { color:var(--t2); font-size:var(--fs); text-align:center }
+td.price { font-weight:700; text-align:center }
 td.price.hi { color:var(--red) }
 td.price.mi { color:var(--amber) }
 td.price.lo { color:var(--green) }
 td.fee { text-align:center; color:var(--t2); font-size:var(--fs) }
-td.note { text-align:right; color:var(--t3); font-size:var(--fs) }
+td.note { text-align:center; color:var(--t3); font-size:var(--fs) }
 td.act { text-align:center }
 
 /* 垂直分割线 */
@@ -347,17 +347,17 @@ function render(){
     if(admin) h+='<col class="col-act">';
     h+='</colgroup>';
     if(key==='thin'){
-    h+='<thead><tr><th>材质 / 牌号</th><th>规格</th><th style="text-align:right">整板</th><th style="text-align:right">一刀切</th><th style="text-align:right">零切</th>';
+    h+='<thead><tr><th>材质 / 牌号</th><th>规格</th><th>整板</th><th>一刀切</th><th>零切</th>';
     if(showFee) h+='<th style="text-align:center">切口费</th>';
-    h+='<th style="text-align:right">备注</th>';
+    h+='<th >备注</th>';
   } else if(key==='bar'){
-    h+='<thead><tr><th>材质 / 牌号</th><th>规格</th><th style="text-align:right">零切不含税</th>';
+    h+='<thead><tr><th>材质 / 牌号</th><th>规格</th><th>零切不含税</th>';
     if(showFee) h+='<th style="text-align:center">切口费</th>';
-    h+='<th style="text-align:right">备注</th>';
+    h+='<th >备注</th>';
   } else {
-    h+='<thead><tr><th>材质 / 牌号</th><th>规格</th><th style="text-align:right">单价</th>';
+    h+='<thead><tr><th>材质 / 牌号</th><th>规格</th><th >单价</th>';
     if(showFee) h+='<th style="text-align:center">切口费</th>';
-    h+='<th style="text-align:right">备注</th>';
+    h+='<th >备注</th>';
   }
     if(admin) h+='<th>操作</th>';
     h+='</tr></thead><tbody>';
