@@ -305,65 +305,143 @@ cutFee:[
 ]};
 
 
-// Supabase
-// Supabase via fetch API (no CDN needed)
+// Supabase fetch (background sync)
 const SB_URL='https://kkmyrpfbkeflfhyynckm.supabase.co';
 const SB_KEY='sb_publishable_1272s6gsC1zMBi6ncyGIeQ_n4TCJvLM';
-const TABLES={thick:'thick',thin:'thin',bar:'bar',cutFee:'cutfee'};
-
-function sbFetch(path,opts={}){
-  const url=SB_URL+'/rest/v1/'+path;
-  const headers={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'};
-  if(opts.body) headers['Prefer']='return=representation';
-  return fetch(url,{method:opts.method||'GET',headers,body:opts.body?JSON.stringify(opts.body):undefined})
-    .then(r=>{if(!r.ok) throw new Error(r.status); const ct=r.headers.get('content-type')||''; return ct.includes('json')?r.json():r.text();});
+const STAB={thick:'thick',thin:'thin',bar:'bar',cutFee:'cutfee'};
+function sf(path,opts={}){
+  const h={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+  return fetch(SB_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:h,body:opts.body?JSON.stringify(opts.body):undefined})
+    .then(r=>r.ok?r.json():Promise.reject(r.status));
 }
+async function syncDB(){
+  try{
+    const r=await sf('thick?select=id&limit=1');
+    if(Array.isArray(r)&&r.length===0){
+      for(const [k,items] of Object.entries(INIT)){
+        if(!items.length) continue;
+        const batch=items.map(x=>{const o={...x};delete o.id;return o;});
+        await sf(STAB[k],{method:'POST',body:batch});
+      }
+    }
+    for(const k of KEYS){
+      try{const rows=await sf(STAB[k]+'?select=*&order=sort_order');if(rows&&rows.length)data[k]=rows;}catch(e){}
+    }
+    save();render();syncDB();toast('已同步云端');
+  }catch(e){console.log('Supabase:',e.message||e);}
+}
+async function dbCRUD(k,action,item,id){
+  try{
+    if(action==='save'){const x={...item};delete x.id;if(id)await sf(STAB[k]+'?id=eq.'+id,{method:'PATCH',body:x});else await sf(STAB[k],{method:'POST',body:x});}
+    else if(action==='del') await sf(STAB[k]+'?id=eq.'+id,{method:'DELETE'});
+  }catch(e){console.log('DB sync err:',e.message||e);}
+}
+const KEYS=['thick','thin','bar','cutFee'], TABS=['中厚板','薄板','圆棒','切口费标准'];
 
 let data=JSON.parse(JSON.stringify(INIT));
 try{ const v=localStorage.getItem('sp'); if(v) data=JSON.parse(v); }catch(e){}
+function save(){ localStorage.setItem('sp',JSON.stringify(data)); }
 
-// Background Supabase sync
-async function syncDB(){
-  try{
-    const res=await sbFetch('thick?select=id&limit=1');
-    if(Array.isArray(res)&&res.length===0){ await seedDB(); }
-    await loadFromDB();
-    localStorage.setItem('sp',JSON.stringify(data));
-    render();
-    toast('已同步云端数据');
-  }catch(e){ console.log('Supabase同步跳过:',e.message); }
-}
+let cur=0, q='', admin=false;
 
-async function seedDB(){
-  for(const [key,items] of Object.entries(INIT)){
-    if(!items.length) continue;
-    try{
-      const batch=items.map(r=>{const x={...r};delete x.id;if(key==='thin'&&x.oneCut!==undefined){x.onecut=x.oneCut;delete x.oneCut;}return x;});
-      await sbFetch(TABLES[key],{method:'POST',body:batch});
-    }catch(e){console.log('seed err '+key,e.message);}
+function badge(t){ const m={carbon:'cb',quality:'cq',alloy:'ca',stainless:'cs',spring:'cp',tool:'ct',hsla:'ch',nickel:'cn',other:'cb'}; return m[t]||'cb'; }
+function pcls(p){ const n=parseFloat(p); if(isNaN(n)) return ''; return n>=15?'hi':n>=8?'mi':'lo'; }
+function fmtp(p){ return p==='—'||p==='待定'?p:'¥'+p; }
+
+function dotc(t){ const m={carbon:'--blue',quality:'--teal',alloy:'--amber',stainless:'--slate',spring:'--purple',tool:'--red',hsla:'--green',nickel:'--indigo',other:'--accent'}; return getComputedStyle(document.documentElement).getPropertyValue(m[t]||m.other).trim().replace(/^#/,''); }
+
+function render(){
+  const key=KEYS[cur]; let items=data[key];
+  if(q){ const t=q.toLowerCase(); items=items.filter(i=>Object.values(i).some(v=>String(v).toLowerCase().includes(t))); }
+  const showFee=key==='cutFee'||document.getElementById('chkFee')?.checked;
+
+  document.getElementById('tabs').innerHTML=TABS.map((t,i)=>'<button class="tab'+(i===cur?' active':'')+'" data-i="'+i+'">'+t+'</button>').join('');
+
+  if(!items.length){ document.getElementById('content').innerHTML='<div class="no-r">未找到匹配项</div>'; return; }
+
+  const grp={}; items.forEach(i=>{ if(!grp[i.cat]) grp[i.cat]=[]; grp[i.cat].push(i); });
+  let h='';
+  for(const [cat,rows] of Object.entries(grp)){
+    const t=rows[0].type;
+    h+='<div class="sec"><div class="sec-head on" onclick="this.classList.toggle(\'on\');this.nextElementSibling.classList.toggle(\'on\')">';
+    h+='<div class="sec-dot" style="background:#'+dotc(t)+'"></div><span class="sec-name">'+cat+'</span>';
+    h+='<span class="sec-n">'+rows.length+'项</span><span class="sec-arr">▼</span></div>';
+    h+='<div class="sec-body on"><div class="tbl-wrap"><table>';
+    if(key==='thin'){
+    h+='<colgroup><col class="col-mat"><col class="col-spec"><col class="col-price2"><col class="col-price2"><col class="col-price2">';
+    if(showFee) h+='<col class="col-fee">';
+    h+='<col class="col-note">';
+  } else {
+    h+='<colgroup><col class="col-mat"><col class="col-spec"><col class="col-price">';
+    if(showFee) h+='<col class="col-fee">';
+    h+='<col class="col-note">';
   }
-}
-
-async function loadFromDB(){
-  for(const key of KEYS){
-    try{
-      const rows=await sbFetch(TABLES[key]+'?select=*&order=sort_order');
-      if(rows&&rows.length) data[key]=rows.map(r=>{if(key==='thin'&&r.onecut!==undefined){r.oneCut=r.onecut;delete r.onecut;}return r;});
-    }catch(e){}
+    if(admin) h+='<col class="col-act">';
+    h+='</colgroup>';
+    if(key==='thin'){
+    h+='<thead><tr><th>材质 / 牌号</th><th>规格</th><th>整板</th><th>一刀切</th><th>零切</th>';
+    if(showFee) h+='<th style="text-align:center">切口费</th>';
+    h+='<th >备注</th>';
+  } else if(key==='bar'){
+    h+='<thead><tr><th>材质 / 牌号</th><th>规格</th><th>零切不含税</th>';
+    if(showFee) h+='<th style="text-align:center">切口费</th>';
+    h+='<th >备注</th>';
+  } else {
+    h+='<thead><tr><th>材质 / 牌号</th><th>规格</th><th >单价</th>';
+    if(showFee) h+='<th style="text-align:center">切口费</th>';
+    h+='<th >备注</th>';
   }
-  localStorage.setItem('sp',JSON.stringify(data));
+    if(admin) h+='<th>操作</th>';
+    h+='</tr></thead><tbody>';
+
+    rows.forEach(r=>{
+      const idx=data[key].indexOf(r);
+      h+='<tr>';
+      h+='<td class="mat"><span class="badge b-'+badge(r.type)+'">'+TL[r.type]+'</span>'+r.mat+(r.origin?'<br><small style="color:var(--t3);font-size:11px">'+r.origin+'</small>':'')+'</td>';
+      h+='<td class="spec">'+r.spec+'</td>';
+      if(key==='thin'){
+        h+='<td class="price '+pcls(r.whole)+'">'+fmtp(r.whole)+'</td>';
+        h+='<td class="price '+pcls(r.oneCut)+'">'+fmtp(r.oneCut)+'</td>';
+        h+='<td class="price '+pcls(r.retail)+'">'+fmtp(r.retail)+'</td>';
+      } else {
+        h+='<td class="price '+pcls(r.price)+'">'+fmtp(r.price)+'</td>';
+      }
+      if(showFee) h+='<td class="fee">'+r.fee+'</td>';
+      h+='<td class="note">'+r.note+'</td>';
+      if(admin) h+='<td><button class="btn btn-o btn-xs" onclick="editItem(\''+key+'\','+idx+')">✎</button> <button class="btn btn-d btn-xs" onclick="delItem(\''+key+'\','+idx+')">✕</button></td>';
+      h+='</tr>';
+    });
+    h+='</tbody></table></div></div></div>';
+  }
+  document.getElementById('content').innerHTML=h;
+  document.getElementById('footer').innerHTML=cur<3
+    ? '<em>以上材料单价均不含税 &nbsp; 含税÷0.9 &nbsp;|&nbsp; 毛料可理算:厚度+3/+5，长宽+5 &nbsp;|&nbsp; 毛料余量超差损耗算我的</em>'
+    : '';
 }
 
-async function dbSave(key,item,id){
-  try{
-    const row={...item};delete row.id;if(key==='thin'&&row.oneCut!==undefined){row.onecut=row.oneCut;delete row.oneCut;}
-    if(id) await sbFetch(TABLES[key]+'?id=eq.'+id,{method:'PATCH',body:row});
-    else {const res=await sbFetch(TABLES[key],{method:'POST',body:row});if(res&&res.length) item.id=res[0].id;}
-  }catch(e){console.log('save err:',e.message);}
-}
-async function dbDel(key,id){
-  try{await sbFetch(TABLES[key]+'?id=eq.'+id,{method:'DELETE'});}catch(e){}
-}
+/* CRUD */
+function editItem(k,i){ const it=data[k][i]; document.getElementById('modalTitle').textContent='编辑条目'; document.getElementById('fId').value=i; document.getElementById('fKey').value=k; document.getElementById('fCat').value=it.cat; document.getElementById('fMat').value=it.mat; document.getElementById('fSpec').value=it.spec; document.getElementById('fPrice').value=it.price; document.getElementById('fFee').value=it.fee; document.getElementById('fOrigin').value=it.origin||'';document.getElementById('fNote').value=it.note; document.getElementById('fType').value=it.type; document.getElementById('modalBg').classList.add('on'); }
+function addItem(){ const k=KEYS[cur]; document.getElementById('modalTitle').textContent='新增条目'; document.getElementById('fId').value=-1; document.getElementById('fKey').value=k; ['fCat','fMat','fSpec','fOrigin','fPrice','fFee','fNote'].forEach(id=>document.getElementById(id).value=''); document.getElementById('fType').value='carbon'; document.getElementById('modalBg').classList.add('on'); }
+function closeModal(){ document.getElementById('modalBg').classList.remove('on'); }
+function saveItem(e){ e.preventDefault(); const k=document.getElementById('fKey').value; const i=parseInt(document.getElementById('fId').value); const it={cat:document.getElementById('fCat').value.trim(),type:document.getElementById('fType').value,mat:document.getElementById('fMat').value.trim(),spec:document.getElementById('fSpec').value.trim(),price:document.getElementById('fPrice').value.trim()||'—',fee:document.getElementById('fFee').value.trim()||'—',note:document.getElementById('fNote').value.trim(),origin:document.getElementById('fOrigin').value.trim()}; if(i>=0) data[k][i]=it; else data[k].push(it); save(); closeModal(); render(); toast(i>=0?'已更新':'已添加'); }
+function delItem(k,i){ if(!confirm('确定删除？\n\n'+data[k][i].mat+' '+data[k][i].spec)) return; data[k].splice(i,1); save(); render(); toast('已删除'); }
+
+/* Export/Import/Reset */
+document.getElementById('btnExport').onclick=()=>{ const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='steel-price-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); toast('已备份'); };
+function imp(e){ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); if(!d.thick||!d.thin||!d.bar) throw 0; data=d; save(); render(); toast('已恢复'); }catch(x){ toast('格式错误'); } }; r.readAsText(f); e.target.value=''; }
+document.getElementById('btnReset').onclick=()=>{ if(!confirm('恢复为初始数据？所有修改将丢失！')) return; data=JSON.parse(JSON.stringify(INIT)); save(); render(); toast('已重置'); };
+
+/* Admin toggle */
+document.getElementById('btnAdmin').onclick=function(){ admin=!admin; this.textContent=admin?'🔓 退出':'🔒 编辑'; this.className='btn '+(admin?'btn-d':'btn-n')+' btn-xs'; document.getElementById('adminBar').classList.toggle('on',admin); render(); };
+
+/* Evts */
+document.getElementById('search').addEventListener('input',e=>{ q=e.target.value; render(); });
+document.getElementById('tabs').addEventListener('click',e=>{ const b=e.target.closest('.tab'); if(!b) return; cur=parseInt(b.dataset.i); render(); });
+document.getElementById('modalBg').addEventListener('click',e=>{ if(e.target===document.getElementById('modalBg')) closeModal(); });
+document.getElementById('chkFee').onchange=render;
+
+function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); setTimeout(()=>e.classList.remove('on'),1800); }
+
 render();
 </script>
 </body>
