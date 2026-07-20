@@ -73,17 +73,18 @@ body {
 
 /* Table */
 .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch }
-table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:560px }
+table { width:100%; border-collapse:collapse; table-layout:fixed; min-width:670px }
 th { font-size:var(--fs); color:var(--t3); font-weight:600; text-align:left; padding:7px 8px; border-bottom:2px solid var(--b); background:var(--card2); white-space:nowrap }
-td { padding:9px 8px; border-bottom:1px solid var(--b); font-size:var(--fm); vertical-align:middle; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+td { padding:9px 8px; border-bottom:1px solid var(--b); font-size:var(--fm); vertical-align:middle }
+td.mat { white-space:nowrap }
 tr:last-child td { border-bottom:none }
 tr:nth-child(even) td { background:var(--card2) }
 
-.col-mat { width:160px }
-.col-spec { width:155px }
-.col-price { width:75px; text-align:right }
-.col-fee { width:70px; text-align:center }
-.col-note { width:100px; text-align:right }
+.col-mat { width:170px }
+.col-spec { width:180px }
+.col-price { width:105px; text-align:right }
+.col-fee { width:80px; text-align:center }
+.col-note { width:105px; text-align:right }
 .col-act { width:60px; text-align:center }
 
 td.mat { font-weight:600 }
