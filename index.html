@@ -203,6 +203,7 @@ td:last-child { border-right:none }
 <script>
 const TL={carbon:'碳素',quality:'优质碳素',alloy:'合金',stainless:'不锈钢',spring:'弹簧钢',tool:'工具钢',hsla:'高强钢',nickel:'镍钢',other:'其他'};
 const TC={carbon:'cb',quality:'cq',alloy:'ca',stainless:'cs',spring:'cp',tool:'ct',hsla:'ch',nickel:'cn',other:'cb'};
+var SB_URL="https://kkmyrpfbkeflfhyynckm.supabase.co";var SB_KEY="sb_publishable_1272s6gsC1zMBi6ncyGIeQ_n4TCJvLM";var STAB={thick:"thick",thin:"thin",bar:"bar",cutFee:"cutfee"};function sf(p,o){o=o||{};var h={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};return fetch(SB_URL+"/rest/v1/"+p,{method:o.method||"GET",headers:h,body:o.body?JSON.stringify(o.body):undefined}).then(function(r){return r.ok?r.json():Promise.reject(r.status)});}async function bgSync(){try{for(var i=0;i<KEYS.length;i++){try{var rows=await sf(STAB[KEYS[i]]+"?select=*&order=sort_order&limit=1000");if(rows&&rows.length>data[KEYS[i]].length){data[KEYS[i]]=rows;}}catch(e){}}save();render();}catch(e){}}async function seedDB(){try{var r=await sf("thick?select=id&limit=1");if(!Array.isArray(r)||r.length===0){for(var k in INIT){if(!INIT[k].length)continue;await sf(STAB[k],{method:"POST",body:INIT[k].map(function(x){var o={};for(var f in x){if(f!="id")o[f]=x[f];}return o;})});}}}catch(e){}}async function dbPut(k,item){try{var x={};for(var f in item){if(f!="id")x[f]=item[f];}await sf(STAB[k],{method:"POST",body:x});}catch(e){}}async function dbPatch(k,id,item){try{var x={};for(var f in item){if(f!="id")x[f]=item[f];}await sf(STAB[k]+"?id=eq."+id,{method:"PATCH",body:x});}catch(e){}}async function dbDel(k,id){try{await sf(STAB[k]+"?id=eq."+id,{method:"DELETE"});}catch(e){}}
 
 const INIT={thick:[
 {cat:'碳素结构钢',type:'carbon',mat:'Q235 / A3 轧制板',spec:'10 / 12 / 14mm',price:'5.5',fee:'—',note:''},
@@ -410,7 +411,7 @@ document.getElementById('chkFee').onchange=render;
 
 function toast(m){ const e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); setTimeout(()=>e.classList.remove('on'),1800); }
 
-render();
+render();bgSync();seedDB();
 </script>
 </body>
 </html>
