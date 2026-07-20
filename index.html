@@ -2,6 +2,692 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>璐㈡櫉鐗规畩閽?路 浠锋牸琛?/title>
+<style>
+:root {
+  --bg: #f5f3f0; --surface: #fff; --surface2: #faf9f7; --border: #e5e0d8;
+  --text: #2c2420; --text2: #6b5e55; --text3: #9b8c80; --accent: #c84b1c;
+  --blue: #2a6496; --teal: #1a7a6d; --amber: #b8780a; --purple: #6b3fa0;
+  --slate: #4a5568; --green: #2d6a4f; --red: #a83232; --indigo: #3b4f8c;
+  --rose: #b04560; --shadow: 0 1px 3px rgba(0,0,0,.06);
+  --radius: 10px; --font-sm: 12px; --font-base: 14px; --font-lg: 16px;
+  --font-xl: 20px; --font-2xl: 26px;
+  --danger: #d92d20; --warning: #f5a623;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1816; --surface: #242220; --surface2: #2a2825; --border: #3a3530;
+    --text: #e8e0d8; --text2: #b0a598; --text3: #7a7065; --accent: #e87848;
+    --blue: #5b9fd4; --teal: #4db8a8; --amber: #d4a030; --purple: #9b6fd4;
+    --slate: #8899aa; --green: #5a9a72; --red: #d45858; --indigo: #6b80c0;
+    --rose: #d47088; --danger: #f87168; --warning: #fbbd23;
+  }
+}
+* { box-sizing:border-box; margin:0; padding:0 }
+body {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg); color:var(--text); font-size:var(--font-base); line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Header */
+.header { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 16px; position:sticky; top:0; z-index:100; box-shadow:var(--shadow) }
+.header-inner { max-width:800px; margin:0 auto; display:flex; align-items:center; gap:10px; flex-wrap:wrap }
+.header h1 { font-size:var(--font-xl); font-weight:700; white-space:nowrap }
+.header .sub { font-size:var(--font-sm); color:var(--text3) }
+.header-right { margin-left:auto; display:flex; gap:8px; align-items:center }
+.btn {
+  padding:7px 14px; font-size:var(--font-sm); font-weight:600; border:none; border-radius:8px;
+  cursor:pointer; transition:.15s; white-space:nowrap; display:inline-flex; align-items:center; gap:4px;
+}
+.btn-sm { padding:5px 10px; font-size:11px }
+.btn-primary { background:var(--accent); color:#fff }
+.btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text2) }
+.btn-danger { background:var(--danger); color:#fff }
+.btn-success { background:var(--green); color:#fff }
+.btn:hover { opacity:.85 }
+
+/* Admin bar */
+.admin-bar { display:none; background:var(--surface2); border-bottom:1px solid var(--border); padding:8px 16px }
+.admin-bar.on { display:block }
+.admin-inner { max-width:800px; margin:0 auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+.admin-badge { font-size:11px; background:var(--danger); color:#fff; padding:3px 8px; border-radius:4px; font-weight:700 }
+
+/* Search */
+.search-wrap { max-width:800px; margin:0 auto; padding:10px 16px 0 }
+.search-box {
+  width:100%; padding:10px 14px; font-size:var(--font-base); border:1.5px solid var(--border);
+  border-radius:var(--radius); background:var(--surface); color:var(--text); outline:none; transition:border-color .2s;
+}
+.search-box:focus { border-color:var(--accent) }
+
+/* Tabs */
+.tabs { max-width:800px; margin:0 auto; padding:8px 16px 0; display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch }
+.tab { padding:8px 16px; font-size:var(--font-sm); font-weight:600; border:none; border-radius:8px; cursor:pointer; background:var(--surface2); color:var(--text2); white-space:nowrap; transition:all .2s; border:1px solid transparent }
+.tab.active { background:var(--accent); color:#fff }
+
+/* Stats */
+.stats { max-width:800px; margin:0 auto; padding:8px 16px 0; display:flex; gap:8px; flex-wrap:wrap }
+.stat { flex:1; min-width:70px; padding:8px 10px; border-radius:var(--radius); background:var(--surface); border:1px solid var(--border); text-align:center }
+.stat .n { font-size:var(--font-xl); font-weight:700; color:var(--accent); line-height:1.2 }
+.stat .l { font-size:11px; color:var(--text3) }
+
+/* Content */
+.content { max-width:800px; margin:0 auto; padding:8px 16px 40px }
+.sheet { display:none }
+.sheet.active { display:block }
+
+/* Category */
+.cat { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); margin-bottom:10px; box-shadow:var(--shadow); overflow:hidden }
+.cat-head { display:flex; align-items:center; gap:8px; padding:11px 12px; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; transition:background .15s }
+.cat-head:hover { background:var(--surface2) }
+.cat-head.on { border-bottom:1px solid var(--border) }
+.cat-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0 }
+.cat-name { font-size:var(--font-lg); font-weight:600; flex:1 }
+.cat-count { font-size:12px; color:var(--text3); background:var(--surface2); padding:2px 8px; border-radius:10px }
+.cat-arrow { font-size:12px; color:var(--text3); transition:.2s }
+.cat-head.on .cat-arrow { transform:rotate(180deg) }
+.cat-body { display:none }
+.cat-body.on { display:block }
+
+/* Table */
+.tbl { width:100%; border-collapse:collapse }
+.tbl th { font-size:var(--font-sm); color:var(--text3); font-weight:500; text-align:left; padding:7px 10px; border-bottom:2px solid var(--border); background:var(--surface2); white-space:nowrap }
+.tbl td { padding:8px 10px; border-bottom:1px solid var(--border); font-size:var(--font-base); vertical-align:middle }
+.tbl tr:last-child td { border-bottom:none }
+.tbl .mat { font-weight:600; min-width:100px }
+.tbl .spec { color:var(--text2); font-size:13px }
+.tbl .price { font-weight:700; white-space:nowrap; text-align:right }
+.tbl .price.high { color:var(--red) }
+.tbl .price.mid { color:var(--amber) }
+.tbl .price.low { color:var(--green) }
+.tbl .fee { text-align:right; white-space:nowrap; color:var(--text2); font-size:13px }
+.tbl .act { text-align:right; white-space:nowrap }
+.tbl .act button { margin-left:2px }
+
+/* Badge */
+.badge { display:inline-block; padding:1px 6px; border-radius:4px; font-size:11px; font-weight:600 }
+.badge-carbon { background:#e3edf7; color:var(--blue) }
+.badge-quality { background:#daf0ec; color:var(--teal) }
+.badge-alloy { background:#fef0dc; color:var(--amber) }
+.badge-stainless { background:#edf0f3; color:var(--slate) }
+.badge-spring { background:#efe4f8; color:var(--purple) }
+.badge-hsla { background:#ddf0e4; color:var(--green) }
+.badge-tool { background:#fce4e4; color:var(--red) }
+.badge-nickel { background:#e4e8f4; color:var(--indigo) }
+@media (prefers-color-scheme: dark) {
+  .badge-carbon { background:#1e3044 } .badge-quality { background:#1a3832 }
+  .badge-alloy { background:#3a2c14 } .badge-stainless { background:#252a30 }
+  .badge-spring { background:#2a1e3a } .badge-hsla { background:#1a3022 }
+  .badge-tool { background:#3a1e1e } .badge-nickel { background:#1e2240 }
+}
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; justify-content:center; align-items:flex-start; padding:20px; overflow-y:auto }
+.modal-overlay.on { display:flex }
+.modal { background:var(--surface); border-radius:var(--radius); padding:20px 16px; width:100%; max-width:500px; box-shadow:0 8px 30px rgba(0,0,0,.2) }
+.modal h3 { font-size:var(--font-lg); margin-bottom:14px }
+.modal label { display:block; font-size:var(--font-sm); font-weight:600; color:var(--text2); margin-bottom:4px; margin-top:10px }
+.modal input, .modal select { width:100%; padding:9px 10px; font-size:var(--font-base); border:1.5px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); outline:none }
+.modal input:focus, .modal select:focus { border-color:var(--accent) }
+.modal .btns { display:flex; gap:8px; margin-top:16px; justify-content:flex-end }
+
+/* Contact */
+.contact { max-width:800px; margin:0 auto; padding:0 16px 20px; text-align:center; font-size:13px; color:var(--text3) }
+.contact strong { color:var(--accent) }
+
+/* Toast */
+.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:20px; font-size:14px; z-index:300; opacity:0; transition:opacity .3s; pointer-events:none }
+.toast.on { opacity:1 }
+@media (prefers-color-scheme: dark) { .toast { background:#555 } }
+
+.no-result { text-align:center; padding:40px; color:var(--text3) }
+
+/* responsive table scroll */
+.tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>馃敥 璐㈡櫉鐗规畩閽?/h1>
+    <span class="sub">2026 鍚岃鎵瑰彂浠锋牸琛?/span>
+    <div class="header-right">
+      <button class="btn btn-outline btn-sm" id="btnExport" title="瀵煎嚭鏁版嵁澶囦唤">馃摜 澶囦唤</button>
+      <button class="btn btn-outline btn-sm" id="btnImport" onclick="document.getElementById('importFile').click()">馃摛 鎭㈠</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn btn-outline btn-sm" id="btnReset">馃攧 閲嶇疆</button>
+      <button class="btn btn-sm" id="btnAdmin" style="background:var(--slate);color:#fff">馃敀 缂栬緫妯″紡</button>
+    </div>
+  </div>
+</div>
+
+<div class="admin-bar" id="adminBar">
+  <div class="admin-inner">
+    <span class="admin-badge">鉁忥笍 缂栬緫妯″紡</span>
+    <span style="font-size:12px;color:var(--text2)">鍙坊鍔犮€佷慨鏀广€佸垹闄ゆ暟鎹」</span>
+    <button class="btn btn-success btn-sm" onclick="addNewItem()">锛?鏂板鏉＄洰</button>
+    <label style="font-size:12px;color:var(--text3);margin-left:auto;cursor:pointer;display:flex;align-items:center;gap:4px">
+      <input type="checkbox" id="chkShowFee" checked onchange="doRender()"> 鏄剧ず鍒囧彛璐瑰垪
+    </label>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <input class="search-box" placeholder="馃攳 鎼滅储鐗屽彿 / 鏉愯川 / 瑙勬牸鈥? id="search" autocomplete="off">
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-s="0">馃搵 涓帤鏉?/button>
+  <button class="tab" data-s="1">馃搻 钖勬澘</button>
+  <button class="tab" data-s="2">鈿?鍦嗘</button>
+  <button class="tab" data-s="3">鉁傦笍 鍒囧彛璐规爣鍑?/button>
+</div>
+<div class="stats" id="stats"></div>
+<div class="content" id="content"></div>
+<div class="contact" id="contactBar"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modalTitle">鏂板鏉＄洰</h3>
+    <form id="modalForm" onsubmit="saveItem(event)">
+      <input type="hidden" id="fId">
+      <input type="hidden" id="fSheet">
+      <label>绫诲埆鍒嗙粍</label><input id="fCat" required placeholder="濡傦細纰崇礌缁撴瀯閽?>
+      <label>鏉愯川鐗屽彿</label><input id="fMat" required placeholder="濡傦細Q235 / A3 杞у埗鏉?>
+      <label>瑙勬牸</label><input id="fSpec" required placeholder="濡傦細10 / 12 / 14mm">
+      <label>鍗曚环 (鍏?KG)</label><input id="fPrice" placeholder="濡傦細5.5">
+      <label>鍒囧彛璐?/label><input id="fFee" placeholder="濡傦細鏃?>
+      <label>澶囨敞</label><input id="fNote" placeholder="濡傦細鏁存澘">
+      <label>閽㈢鏍囩</label>
+      <select id="fType">
+        <option value="carbon">纰崇礌閽?/option><option value="quality">浼樿川纰崇礌</option>
+        <option value="alloy">鍚堥噾閽?/option><option value="stainless">涓嶉攬閽?/option>
+        <option value="spring">寮圭哀閽?/option><option value="tool">宸ュ叿閽?/option><option value="hsla">楂樺己閽?/option><option value="nickel">闀嶉挗</option><option value="other">鍏朵粬</option>
+      </select>
+      <div class="btns">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">鍙栨秷</button>
+        <button type="submit" class="btn btn-primary">淇濆瓨</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// 鈹€鈹€鈹€ DATA 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+const TYPE_LABELS = {carbon:'纰崇礌',quality:'浼樿川纰崇礌',alloy:'鍚堥噾',stainless:'涓嶉攬閽?,spring:'寮圭哀閽?,tool:'宸ュ叿閽?,hsla:'楂樺己閽?,nickel:'闀嶉挗',other:'鍏朵粬'};
+
+const INITIAL_DATA = {
+  thick: [
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q235 / A3 杞у埗鏉?,spec:'10 / 12 / 14mm',price:'5.5',fee:'鈥?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q235 / A3 杞у埗鏉?,spec:'14 鈥?100mm',price:'5.3',fee:'鈥?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q355 (Q345B) 杞у埗鏉?,spec:'14 鈥?80mm',price:'5.8',fee:'鈥?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q355 (Q345B) 杞у埗鏉?,spec:'85 鈥?100mm',price:'6.0',fee:'鈥?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'20# 杞у埗鏉?,spec:'10 鈥?12mm',price:'6.5',fee:'鈥?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'20# 杞у埗鏉?,spec:'14 鈥?80mm',price:'6.3',fee:'鈥?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'20# 杞у埗鏉?,spec:'85 鈥?100mm',price:'6.5',fee:'鈥?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'35# 杞у埗鏉?,spec:'6 / 8 / 10mm',price:'6.5',fee:'鈥?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'35# 杞у埗鏉?,spec:'12 鈥?60mm',price:'6.5',fee:'鈥?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'45# 杞у埗鏉?,spec:'10mm',price:'4.8',fee:'鈥?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'45# 杞у埗鏉?,spec:'12mm',price:'4.6',fee:'鈥?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'45# 杞у埗鏉?,spec:'14 鈥?95mm',price:'4.0',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'Q690D 杞у埗鏉?,spec:'12mm',price:'7.8',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'Q690D 杞у埗鏉?,spec:'16 鈥?80mm',price:'7.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'Q690D 杞у埗鏉?,spec:'85 鈥?120mm',price:'7.8',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'40Cr 杞у埗鏉?,spec:'10/12/14mm',price:'5.0',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'40Cr 杞у埗鏉?,spec:'16 鈥?100mm',price:'4.8',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'42CrMo 杞у埗鏉?,spec:'10/12/14mm',price:'5.8',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'42CrMo 杞у埗鏉?,spec:'16 鈥?100mm',price:'5.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'65Mn 杞у埗鏉?,spec:'10mm',price:'6.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'65Mn 杞у埗鏉?,spec:'12mm',price:'5.8',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'65Mn 杞у埗鏉?,spec:'14 鈥?60mm',price:'5.3',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'420 杞у埗鏉?,spec:'10.1鈥?4.1mm',price:'11.0',fee:'鈥?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'420 杞у埗鏉?,spec:'16.1鈥?0.3mm',price:'11.0',fee:'鈥?,note:''},
+    {cat:'涓嶉攬閽?,type:'stainless',mat:'440C 榛戠毊',spec:'8mm',price:'19.2',fee:'鈥?,note:''},
+    {cat:'涓嶉攬閽?,type:'stainless',mat:'440C 榛戠毊',spec:'10mm',price:'18.2',fee:'鈥?,note:''},
+    {cat:'涓嶉攬閽?,type:'stainless',mat:'440C 榛戠毊',spec:'12 / 14mm',price:'16.7',fee:'鈥?,note:''},
+    {cat:'涓嶉攬閽?,type:'stainless',mat:'440C 榛戠毊',spec:'14 鈥?65mm',price:'16.2',fee:'鈥?,note:''},
+    {cat:'涓嶉攬閽?,type:'stainless',mat:'440C 閾ｅ厜',spec:'65 鈥?100mm',price:'16.2',fee:'鈥?,note:''},
+    {cat:'涓嶉攬閽?,type:'stainless',mat:'630 杞у埗鏉?(瀹?500)',spec:'8 鈥?80mm',price:'23.0',fee:'鈥?,note:''},
+    {cat:'涓嶉攬閽?,type:'stainless',mat:'304',spec:'8/10/12mm',price:'寰呭畾',fee:'鈥?,note:'鏈埌璐?},
+    {cat:'涓嶉攬閽?,type:'stainless',mat:'304',spec:'14 鈥?80mm',price:'17.0',fee:'鈥?,note:''},
+    {cat:'鍏妫?,type:'alloy',mat:'42CrMo 鍏妫?鏁存潯',spec:'瀵硅竟17-32 脳 4m',price:'9.3',fee:'鈥?,note:'鏁存潯'},
+    {cat:'鍏妫?,type:'alloy',mat:'42CrMo 鍏妫?闆跺垏',spec:'瀵硅竟17-32 脳 4m',price:'9.8',fee:'鈥?,note:'闆跺垏'},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'carbon',mat:'Q235 妯¤儦',spec:'230脳240',price:'5.0',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'carbon',mat:'Q235 妯¤儦',spec:'370脳510',price:'5.0',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'carbon',mat:'Q355/16Mn 妯¤儦',spec:'235脳240 / 320脳360',price:'5.5',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'carbon',mat:'Q355/16Mn 妯¤儦',spec:'370脳510',price:'5.5',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'quality',mat:'10# 妯¤儦',spec:'170脳190鈥?40脳430',price:'6.3',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'quality',mat:'20# 妯¤儦',spec:'225脳240 / 370脳510',price:'6.0',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'quality',mat:'20Mn 妯¤儦',spec:'320脳420',price:'6.0',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'quality',mat:'35# 妯¤儦',spec:'385脳500',price:'6.5',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'quality',mat:'55# 妯¤儦',spec:'235脳240',price:'6.5',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'quality',mat:'50Mn/50# 妯¤儦',spec:'320脳420',price:'6.5',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'quality',mat:'1214 妯¤儦',spec:'200脳200',price:'6.3',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'spring',mat:'65Mn 妯¤儦',spec:'250脳300 / 400脳500',price:'5.0',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'tool',mat:'82D/T8 妯¤儦',spec:'320脳420',price:'7.0',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'tool',mat:'GCr9 / GCr15 妯¤儦',spec:'320脳420 / 380脳507',price:'9.0',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'tool',mat:'T10 妯¤儦',spec:'250脳300',price:'9.0',fee:'鈥?,note:''},
+    {cat:'楂樹綆纰抽挗妯″潡',type:'quality',mat:'35Mn 妯¤儦',spec:'400脳500',price:'6.8',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'16MnCr5H',spec:'250脳300',price:'8.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'20MnCr5H',spec:'220脳220 / 315脳480',price:'8.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'20CrMnTi',spec:'380脳500',price:'8.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'38CrMoAl',spec:'380脳490',price:'10.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'12Cr1MoV',spec:'340脳430',price:'9.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'20CrMo / 20CrMoA',spec:'240鈥?30脳425',price:'8.0',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'22CrMoH / 30CrMo / 35CrMo',spec:'340鈥?85脳430鈥?00',price:'8.0',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'42CrMo 妯¤儦',spec:'340脳430',price:'5.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'30CrMnSi / 30CrMnSiA',spec:'350脳507',price:'10.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'35CrMnSiA',spec:'310脳360',price:'11.8',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'spring',mat:'50CrV',spec:'305脳560',price:'12.0',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'spring',mat:'60CrV',spec:'250脳300',price:'11.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'spring',mat:'60Si2Cr / 60Si2CrV',spec:'210鈥?50脳560',price:'11.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'spring',mat:'60Si2Mn',spec:'250脳300',price:'11.5',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'alloy',mat:'20Cr',spec:'220脳220',price:'9.0',fee:'鈥?,note:''},
+    {cat:'鍚堥噾閽㈡ā鍧?,type:'tool',mat:'5CrMnMo',spec:'250脳370',price:'17.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'18CrNiMo7-6',spec:'250脳370',price:'15.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'20CrNiMo / 8620H',spec:'380脳505',price:'13.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'SAE8620H',spec:'280脳280',price:'鈥?,fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'20CrNi2Mo',spec:'250脳370',price:'18.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'20Cr2Ni4A',spec:'250脳370',price:'20.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'30CrNiMo8',spec:'250脳370',price:'20.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'30CrMnSiNi2',spec:'250脳300',price:'20.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'34CrNiMo6',spec:'250脳370',price:'18.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'34CrNi3Mo',spec:'250脳370',price:'20.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'4330V',spec:'250脳300',price:'19.8',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'4340 / 40CrNi2MoA',spec:'365脳510',price:'13.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'45CrNiMoV / D6AC',spec:'250脳370',price:'17.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'nickel',mat:'5CrNiMo',spec:'285脳670',price:'18.0',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'stainless',mat:'1Cr13 / 410 閿绘枡',spec:'250脳370',price:'11.5',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'stainless',mat:'2Cr13 / 420J1 閿绘枡',spec:'250脳370',price:'11.5',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'stainless',mat:'3Cr13 / 420J2 閿绘枡',spec:'250脳370',price:'11.5',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'stainless',mat:'4Cr13 閿绘枡',spec:'250脳370',price:'11.5',fee:'鈥?,note:''},
+    {cat:'闀嶉挗妯″潡',type:'stainless',mat:'630 閿绘墦鏂?,spec:'200鈥?00脳410脳L',price:'23.0',fee:'鈥?,note:''},
+  ],
+  thin: [
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'SPCC 鍐疯涧',spec:'0.13脳610脳1000',price:'10.0',fee:'0.3/浠?,note:'鏁存澘'},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'DC01 鍐疯涧',spec:'0.2脳610脳1000',price:'10.0',fee:'0.3/浠?,note:'鏁存澘'},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'0.3脳1000脳2000',price:'7.2/7.7/8.4',fee:'0.3/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'0.4脳1000脳2000',price:'7.2/7.7/8.2',fee:'0.3/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'0.5灏忔澘 1000脳2000',price:'6.2/6.7/7.2',fee:'0.3/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'0.5澶ф澘 1250脳2500',price:'6.0/6.5/7.0',fee:'0.3/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'0.6脳1000脳2000',price:'6.0/6.5/7.0',fee:'0.3/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'0.7脳1000脳2000',price:'6.0/6.5/7.0',fee:'0.3/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'0.8灏忔澘 1000脳2000',price:'6.0/6.5/7.0',fee:'0.3/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'0.8澶ф澘 1250脳2500',price:'6.0/6.5/7.0',fee:'0.3/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'1.0灏忔澘 1000脳2000',price:'5.0/5.8/6.3',fee:'0.3/浠?,note:'7.17宸茶皟鏁?},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'1.0澶ф澘 1250脳2500',price:'5.0/5.8/6.3',fee:'0.3/浠?,note:''},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'1.2脳1250脳2500',price:'5.0/5.8/6.3',fee:'0.3/浠?,note:''},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'A3鍐疯涧',spec:'1.5-2.3脳1250脳2500',price:'5.0/5.8/6.3',fee:'0.3/浠?,note:''},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'闉嶉挗 A3鍐疯涧',spec:'2.5脳1250脳2500',price:'5.0/5.8/6.3',fee:'0.3/浠?,note:''},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'闉嶉挗 A3鍐疯涧',spec:'3.0脳1250脳2500',price:'5.5/6.0/6.5',fee:'0.3/浠?,note:''},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'carbon',mat:'Q235鍐锋澘',spec:'3.5-6.0脳1250脳2500',price:'7.2/8.5',fee:'0.5鈥?/浠?,note:'鍒拌揣'},
+    {cat:'A3鍐疯涧鏉?SPCC/DC01',type:'quality',mat:'08AL鍐锋澘',spec:'6.0脳1250脳2500',price:'7.2/8.5',fee:'1/浠?,note:'鍒拌揣'},
+
+    {cat:'A3鐑涧鏉?Q235',type:'carbon',mat:'Q235 鐑涧',spec:'1.8脳1250脳2500',price:'5.2/5.7/6.2',fee:'0.5/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鐑涧鏉?Q235',type:'carbon',mat:'Q235B 鐑涧',spec:'2.0脳1260脳2500',price:'5.2/5.7/6.2',fee:'0.5/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鐑涧鏉?Q235',type:'carbon',mat:'Q235B 鐑涧',spec:'2.5脳1260脳2500',price:'5.2/5.7/6.2',fee:'0.5/浠?,note:'鏁?涓€鍒€/闆?},
+    {cat:'A3鐑涧鏉?Q235',type:'carbon',mat:'Q235B 鐑涧',spec:'3.0-7.0脳1510脳3000',price:'4.5/5.0/5.5',fee:'0.5鈥?/浠?,note:''},
+    {cat:'A3鐑涧鏉?Q235',type:'carbon',mat:'Q235B 鐑涧',spec:'8.0脳1500脳3000',price:'4.5/5.0/5.5',fee:'1/浠?,note:''},
+    {cat:'A3鐑涧鏉?Q235',type:'carbon',mat:'Q235B 鐑涧',spec:'10脳1510脳3000',price:'4.5/5.0/5.5',fee:'1.5/浠?,note:''},
+    {cat:'A3鐑涧鏉?Q235',type:'carbon',mat:'Q235B 鐑涧',spec:'12脳1510脳3000',price:'4.5/5.0/5.5',fee:'2/浠?,note:''},
+
+    {cat:'閰告礂鏉?SPHC',type:'quality',mat:'SPHC 閰告礂',spec:'2.5-5.0脳1260脳2500',price:'4.6/5.0/6.0',fee:'0.3鈥?.5/浠?,note:'7.17宸茶皟鏁?},
+    {cat:'閰告礂鏉?SPHC',type:'quality',mat:'SPHC 閰告礂',spec:'6.0脳1260脳2500',price:'4.6/5.0/6.0',fee:'1/浠?,note:''},
+    {cat:'閰告礂鏉?SPHC',type:'quality',mat:'SPHC 閰告礂',spec:'8.0脳1260脳2500',price:'4.6/5.0/6.0',fee:'1/浠?,note:''},
+    {cat:'閰告礂鏉?SPHC',type:'quality',mat:'SPHC 閰告礂',spec:'8.0脳1510脳3000',price:'4.6/5.0/6.0',fee:'1/浠?,note:''},
+    {cat:'閰告礂鏉?SPHC',type:'quality',mat:'SPHC 閰告礂',spec:'10脳1510脳3000',price:'5.0/5.5/6.5',fee:'1/浠?,note:''},
+    {cat:'閰告礂鏉?SPHC',type:'quality',mat:'SPHC 閰告礂',spec:'12脳1510脳3000',price:'5.0/5.5/6.5',fee:'1/浠?,note:''},
+
+    {cat:'45#鍐锋澘',type:'quality',mat:'45#鍐锋澘 (-0.03)',spec:'0.8脳1250脳2500',price:'6.8/7.3/8.3',fee:'0.3/浠?,note:''},
+    {cat:'45#鍐锋澘',type:'quality',mat:'45#鍐锋澘 (-0.03)',spec:'1.0-2.5脳1250脳2500',price:'6.5/7.3/7.5',fee:'0.3鈥?.5/浠?,note:'7.17宸茶皟鏁?},
+    {cat:'45#鍐锋澘',type:'quality',mat:'45#鍐锋澘',spec:'3.0脳1250脳2500',price:'7.0/7.5/8.0',fee:'0.5/浠?,note:''},
+    {cat:'45#鍐锋澘',type:'quality',mat:'45#鍐锋澘',spec:'3.5-4.0脳1265脳2500',price:'8.0/9.5',fee:'0.5/浠?,note:''},
+    {cat:'45#鍐锋澘',type:'quality',mat:'45#鍐锋澘',spec:'5.0-6.0脳1260脳2500',price:'8.0/9.5',fee:'1/浠?,note:'涓€鍒€鍒囧彛璐?/浠?},
+    {cat:'45#鐑澘',type:'quality',mat:'45#鐑涧 (-0.1鍐?',spec:'2.0脳1260脳2500',price:'6.0/6.5/7.5',fee:'0.5/浠?,note:''},
+    {cat:'45#鐑澘',type:'quality',mat:'45#鐑涧',spec:'2.5-8.0脳1260脳2500',price:'5.0/5.5/6.0',fee:'0.5鈥?/浠?,note:''},
+    {cat:'45#鐑澘',type:'quality',mat:'45#鐑涧',spec:'7.0脳1260脳2500',price:'5.5/6.0/6.5',fee:'1/浠?,note:''},
+    {cat:'45#鐑澘',type:'quality',mat:'45#鐑涧',spec:'10脳1260脳2500/3000',price:'5.0/5.5/6.0',fee:'3/浠?,note:''},
+
+    {cat:'65Mn寮圭哀閽?鍐疯涧',type:'spring',mat:'65Mn鍐疯涧 鍏夐潰',spec:'1.0脳1250脳2500',price:'6.5/7.0/7.5',fee:'0.5/浠?,note:''},
+    {cat:'65Mn寮圭哀閽?鍐疯涧',type:'spring',mat:'65Mn鍐疯涧 鍏夐潰',spec:'1.2脳1250脳2500',price:'6.8/7.3/7.8',fee:'0.5/浠?,note:''},
+    {cat:'65Mn寮圭哀閽?鍐疯涧',type:'spring',mat:'65Mn鍐疯涧',spec:'1.5-2.5脳1250-1265',price:'6.8/7.3/7.8',fee:'0.5/浠?,note:''},
+    {cat:'65Mn寮圭哀閽?鍐疯涧',type:'spring',mat:'65Mn鍐疯涧',spec:'3.0脳1255脳2500',price:'7.2/8.0/8.5',fee:'0.5/浠?,note:''},
+    {cat:'65Mn寮圭哀閽?鐑涧',type:'spring',mat:'65Mn鐑涧',spec:'2.0脳1260脳2500',price:'6.5/7.0/7.7',fee:'0.5/浠?,note:''},
+    {cat:'65Mn寮圭哀閽?鐑涧',type:'spring',mat:'65Mn鐑涧',spec:'2.5-4.5脳1215-1260',price:'5.8/6.5/7.0',fee:'0.5鈥?/浠?,note:''},
+    {cat:'65Mn寮圭哀閽?鐑涧',type:'spring',mat:'65Mn鐑涧',spec:'5.0-6.0脳1260脳2500',price:'5.8/6.5/7.0',fee:'1鈥?.5/浠?,note:''},
+    {cat:'65Mn寮圭哀閽?鐑涧',type:'spring',mat:'65Mn鐑涧',spec:'8.0-12脳1260脳2500',price:'5.8/6.5/7.0',fee:'2鈥?/浠?,note:''},
+
+    {cat:'DC绯诲垪娣卞啿鏉?,type:'hsla',mat:'DC04/DC05/DC06',spec:'0.4-0.8脳1000-1250',price:'6.5-7.5/7.5-8.2/8.2-9.2',fee:'0.3/浠?,note:''},
+    {cat:'DC绯诲垪娣卞啿鏉?,type:'hsla',mat:'DC04/DC06',spec:'1.0-2.0脳1250脳2500',price:'6.5/7.0/7.5',fee:'0.3/浠?,note:''},
+    {cat:'DC绯诲垪娣卞啿鏉?,type:'hsla',mat:'DC03/DC04/DC05',spec:'2.5-3.0脳1250脳2500',price:'6.5-6.8/7.0-7.3/7.5-7.8',fee:'0.3/浠?,note:''},
+
+    {cat:'Q345 / S355 鐑涧鏉?,type:'carbon',mat:'HC340LA (Q345鍐?',spec:'0.8-3.0脳1170-1270',price:'7.0/8.0',fee:'0.3鈥?.5/浠?,note:'7.17宸茶皟鏁?},
+    {cat:'Q345 / S355 鐑涧鏉?,type:'carbon',mat:'S355 鐑涧鏉?,spec:'2.0脳1510脳3000',price:'8.0/9.4/9.9',fee:'0.5/浠?,note:''},
+    {cat:'Q345 / S355 鐑涧鏉?,type:'carbon',mat:'S355 鐑涧鏉?,spec:'3.0-4.0脳1510脳3000/6000',price:'6.5/7.3/8.0',fee:'0.5/浠?,note:'7.17宸茶皟鏁?},
+    {cat:'Q345 / S355 鐑涧鏉?,type:'carbon',mat:'S355 鐑涧鏉?,spec:'5.0-6.0脳1510脳3000/6000',price:'6.0/7.0/7.5',fee:'1/浠?,note:''},
+    {cat:'Q345 / S355 鐑涧鏉?,type:'carbon',mat:'S355 鐑涧鏉?,spec:'8.0脳1510脳3000',price:'6.0/7.0/7.5',fee:'2/浠?,note:''},
+    {cat:'Q345 / S355 鐑涧鏉?,type:'carbon',mat:'S355 鐑涧鏉?,spec:'10.0脳1510脳3000',price:'6.0/7.0/7.5',fee:'2/浠?,note:''},
+    {cat:'Q345 / S355 鐑涧鏉?,type:'carbon',mat:'S355 鐑涧鏉?,spec:'12.0脳1510脳3000',price:'6.0/7.0/7.5',fee:'3/浠?,note:''},
+
+    {cat:'SK85宸ュ叿閽?,type:'tool',mat:'SK85鍐锋澘/T9',spec:'1.0-5.0脳1260-1270脳1900-2500',price:'8.5/10.5',fee:'0.5鈥?/浠?,note:''},
+    {cat:'SK85宸ュ叿閽?,type:'tool',mat:'SK85鐑澘',spec:'6.0-10脳1260脳2500',price:'8.5/10.5',fee:'1鈥?/浠?,note:''},
+
+    {cat:'60Si2Mn寮圭哀閽?,type:'spring',mat:'60Si2MnA 鍐锋澘',spec:'1.0-2.5脳1100-1250',price:'9.5/10.5',fee:'0.5/浠?,note:'鏂板搧'},
+    {cat:'60Si2Mn寮圭哀閽?,type:'spring',mat:'60Si2MnA 鐑澘',spec:'3.0-10脳1260-1510',price:'8.0/10.0',fee:'1鈥?/浠?,note:''},
+    {cat:'60Si2Mn寮圭哀閽?,type:'spring',mat:'60Si2Mn 纭枡',spec:'2.5脳160脳2020',price:'13.0',fee:'2/浠?,note:'HRC45-50'},
+
+    {cat:'50CrV',type:'spring',mat:'50CrV 鍐疯涧鏉?,spec:'2.0脳1250脳2500',price:'10.5/11.5',fee:'鈥?,note:''},
+    {cat:'50CrV',type:'spring',mat:'50CrV 鐑涧鏉?,spec:'3.0-8.0脳1250脳2500',price:'10.5/11.5',fee:'2鈥?/浠?,note:'鏂板搧'},
+
+    {cat:'HC绯诲垪楂樺己閽?,type:'hsla',mat:'HC340LA',spec:'0.8-3.0脳1170-1270',price:'7.0/8.0',fee:'0.3鈥?.5/浠?,note:''},
+    {cat:'HC绯诲垪楂樺己閽?,type:'hsla',mat:'HC420LA / QST绯诲垪',spec:'3.0-8.0脳1220-1370',price:'7.0-7.5/8.0',fee:'0.5鈥?/浠?,note:''},
+    {cat:'HC绯诲垪楂樺己閽?,type:'hsla',mat:'HC420/780DP 鍐锋澘',spec:'0.8-2.5脳1210-1395',price:'7.5/8.5',fee:'0.3鈥?.5/浠?,note:''},
+    {cat:'HC绯诲垪楂樺己閽?,type:'hsla',mat:'HC550-700/980DP 鍐锋澘',spec:'0.8-2.0脳1225-1377',price:'8.5/9.3',fee:'0.3鈥?.5/浠?,note:''},
+    {cat:'HC绯诲垪楂樺己閽?,type:'hsla',mat:'HC420/780DP+Z 闀€閿屾澘',spec:'0.8-2.0脳1200-1500',price:'8.5/9.5',fee:'0.5/浠?,note:''},
+
+    {cat:'42CrMo / 40Cr鐑澘',type:'alloy',mat:'42CrMo 鐑澘',spec:'3.0-8.0脳1260脳3000',price:'8.0/9.5',fee:'0.5鈥?/浠?,note:''},
+    {cat:'42CrMo / 40Cr鐑澘',type:'alloy',mat:'40Cr 鐑涧鏉?,spec:'3.0-6.0脳1260脳4000',price:'7.5/8.5',fee:'1鈥?/浠?,note:'鏂板搧'},
+
+    {cat:'10# 鍐锋澘/鐑澘',type:'quality',mat:'10#鍐锋澘',spec:'0.6-3.0脳1250脳2500',price:'7.0-8.5/8.0-10.5',fee:'0.3鈥?.5/浠?,note:''},
+    {cat:'10# 鍐锋澘/鐑澘',type:'quality',mat:'10#鍐锋澘',spec:'3.5-6.0脳1250脳2500',price:'8.5/10.0-10.5',fee:'0.5鈥?/浠?,note:'涓€鍒€鍒囧彛璐?/浠?},
+    {cat:'10# 鍐锋澘/鐑澘',type:'quality',mat:'10#鐑澘',spec:'3.0-12脳1250脳2500',price:'6.5/7.0',fee:'1鈥?/浠?,note:''},
+
+    {cat:'20# 鍐锋澘/鐑澘',type:'quality',mat:'20#鍐锋澘',spec:'0.6-3.0脳1250脳2500',price:'6.5-7.0/8.0-8.2',fee:'0.3鈥?.5/浠?,note:''},
+    {cat:'20# 鍐锋澘/鐑澘',type:'quality',mat:'20#鍐锋澘',spec:'3.5-6.0脳1260脳2500',price:'8.0-8.5/10.0-10.5',fee:'1.5鈥?/浠?,note:'涓€鍒€鍒囧彛璐?/浠?},
+    {cat:'20# 鍐锋澘/鐑澘',type:'quality',mat:'20#鐑澘',spec:'3.0-10脳1250脳2500',price:'6.5/7.0',fee:'0.5鈥?/浠?,note:''},
+
+    {cat:'涓嶉攬閽?321',type:'stainless',mat:'321/2B',spec:'0.5-3.0脳1220脳2440',price:'24-25/26-27',fee:'0.5鈥?/浠?,note:''},
+    {cat:'涓嶉攬閽?321',type:'stainless',mat:'321宸ヤ笟闈?,spec:'4.0-6.0脳1500脳3000',price:'25/27.5',fee:'2鈥?/浠?,note:''},
+    {cat:'涓嶉攬閽?304L',type:'stainless',mat:'304L/2B',spec:'0.5-3.0脳1220脳2440',price:'21-23/23-25',fee:'0.5鈥?/浠?,note:''},
+    {cat:'涓嶉攬閽?310S',type:'stainless',mat:'310S/2B',spec:'0.5-3.0脳1220脳2440',price:'52/55',fee:'0.5鈥?/浠?,note:''},
+    {cat:'涓嶉攬閽?310S',type:'stainless',mat:'310S宸ヤ笟闈?,spec:'4.0-6.0脳1500脳3000',price:'53/55',fee:'3鈥?/浠?,note:''},
+    {cat:'涓嶉攬閽?316Ti',type:'stainless',mat:'316Ti/2B',spec:'0.8-3.0脳1220-1500',price:'48/53',fee:'0.5鈥?/浠?,note:''},
+    {cat:'涓嶉攬閽?316Ti',type:'stainless',mat:'316Ti宸ヤ笟闈?,spec:'4.0-6.0脳1500脳3000',price:'42/45',fee:'3鈥?/浠?,note:''},
+    {cat:'涓嶉攬閽?420J2',type:'stainless',mat:'420J2/2B',spec:'0.8-3.0脳1265脳2440',price:'12/13/14',fee:'0.5鈥?/浠?,note:'鏂板搧'},
+    {cat:'涓嶉攬閽?430',type:'stainless',mat:'430/2B',spec:'0.4-3.0脳1220脳2440',price:'10/11/12',fee:'0.5鈥?/浠?,note:'鏂板搧'},
+    {cat:'涓嶉攬閽?420J2鍗峰甫',type:'stainless',mat:'420J2鍗峰甫',spec:'0.1-0.8脳C',price:'22-30',fee:'鈥?,note:''},
+
+    {cat:'35#钖勬澘',type:'quality',mat:'35#鍐锋澘',spec:'1.0-2.0脳950-1250',price:'8.5/9.0',fee:'0.3鈥?.5/浠?,note:''},
+    {cat:'Q550D/Q460C鐑澘',type:'hsla',mat:'Q550D鐑澘',spec:'3.0-10脳1510脳3000',price:'8.0/8.5',fee:'0.5鈥?/浠?,note:'涓€鍒€鍒囧彛璐?-5/浠?},
+    {cat:'Q550D/Q460C鐑澘',type:'hsla',mat:'Q460C鐑澘',spec:'2.5-10脳1485-1510',price:'7.5/8.0',fee:'0.5鈥?/浠?,note:'涓€鍒€鍒囧彛璐?-5/浠?},
+  ],
+  bar: [
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q235B',spec:'桅16-桅45',price:'5.5',fee:'0.3/浠?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q235B',spec:'桅50-桅95',price:'5.6',fee:'1/浠?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q235B',spec:'桅100-桅130',price:'5.7',fee:'3/浠?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q235B',spec:'桅140-桅220',price:'5.8',fee:'5/浠?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q235B',spec:'桅230-桅320',price:'6.5',fee:'8鈥?0/浠?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q355B/Q345B',spec:'桅16-桅18',price:'6.0',fee:'0.3/浠?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q355B/Q345B',spec:'桅20-桅95',price:'5.8',fee:'0.3鈥?/浠?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q355B/Q345B',spec:'桅100-桅220',price:'鈥?,fee:'3鈥?/浠?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q355B/Q345B',spec:'桅230-桅260',price:'6.5',fee:'8鈥?0/浠?,note:''},
+    {cat:'纰崇礌缁撴瀯閽?,type:'carbon',mat:'Q355B/Q345B',spec:'桅270-桅380',price:'7.8-8.5',fee:'10鈥?0/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'10#',spec:'桅16-桅18',price:'7.2',fee:'0.3/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'10#',spec:'桅20-桅160',price:'6.6',fee:'0.3鈥?/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'10#',spec:'桅170-桅200',price:'6.8',fee:'5/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'20#',spec:'桅16-桅18',price:'6.0',fee:'0.3/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'20#',spec:'桅20-桅130',price:'5.5',fee:'0.3鈥?/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'20#',spec:'桅140-桅220',price:'5.8',fee:'5/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'20#',spec:'桅230-桅320',price:'6.5',fee:'8鈥?0/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'35#',spec:'桅16鈥斘?8',price:'6.0',fee:'0.3/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'35#',spec:'桅20鈥斘?0',price:'5.8',fee:'0.3鈥?/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'35#',spec:'桅100鈥斘?20',price:'鈥?,fee:'3鈥?/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'35#',spec:'桅230鈥斘?20',price:'6.5',fee:'8鈥?0/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'45#',spec:'桅16鈥斘?8',price:'4.0',fee:'0.3/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'45#',spec:'桅20鈥斘?30',price:'4.3',fee:'0.3鈥?/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'45#',spec:'桅140鈥斘?20',price:'鈥?,fee:'5/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'45#',spec:'桅230鈥斘?60',price:'4.9',fee:'8/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'45#',spec:'桅270鈥斘?10',price:'5.2',fee:'10/浠?,note:''},
+    {cat:'浼樿川纰崇礌閽?,type:'quality',mat:'45#',spec:'桅320鈥斘?30',price:'6.5鈥?.8',fee:'20鈥?0/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'40Cr',spec:'桅16鈥斘?8',price:'5.0',fee:'0.3/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'40Cr',spec:'桅20鈥斘?5',price:'4.6',fee:'0.3鈥?/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'40Cr',spec:'桅100鈥斘?20',price:'鈥?,fee:'3鈥?/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'40Cr',spec:'桅230鈥斘?00',price:'5.0鈥?.0',fee:'8鈥?0/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'42CrMo',spec:'桅14',price:'7.0',fee:'0.3/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'42CrMo',spec:'桅16鈥斘?8',price:'6.5',fee:'0.3/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'42CrMo',spec:'桅20鈥斘?30',price:'6.0',fee:'0.3鈥?/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'42CrMo',spec:'桅140鈥斘?20',price:'鈥?,fee:'5/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'42CrMo',spec:'桅230鈥斘?00',price:'6.5鈥?.5',fee:'8鈥?0/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'30CrMnSiA',spec:'桅14鈥斘?8',price:'9.0',fee:'0.3/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'30CrMnSiA',spec:'桅20鈥斘?5',price:'7.0',fee:'0.3鈥?/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'30CrMnSiA',spec:'桅90鈥斘?60',price:'7.2',fee:'3鈥?/浠?,note:''},
+    {cat:'鍚堥噾缁撴瀯閽?,type:'alloy',mat:'30CrMnSiA',spec:'桅170鈥斘?40',price:'8.5',fee:'5鈥?/浠?,note:''},
+    {cat:'闀嶉摤閽?,type:'nickel',mat:'SAE8620H/20CrNiMoA',spec:'桅14鈥斘?00',price:'8.5鈥?0',fee:'0.3鈥?/浠?,note:''},
+  ],
+  cutFee: [
+    {cat:'鍦嗘鍒囧彛璐规爣鍑?,type:'other',mat:'鑼冨洿璇存槑',spec:'鐩村緞',price:'鈥?,fee:'鍒囧彛璐?,note:'浠ヤ笅鎯呭喌鍖呭惈鍒囧彛璐癸細200鐩村緞浠ヤ笅闀垮害鈮?0mm锛?00浠ヤ笂闀垮害鈮?00mm锛?00浠ヤ笂鍏ㄥ惈'},
+    {cat:'鍦嗘鍒囧彛璐规爣鍑?,type:'other',mat:'桅16-桅80',spec:'鑼冨洿鍐?,price:'鈥?,fee:'0.3/浠?,note:''},
+    {cat:'鍦嗘鍒囧彛璐规爣鍑?,type:'other',mat:'桅85-桅105',spec:'鑼冨洿鍐?,price:'鈥?,fee:'1/浠?,note:''},
+    {cat:'鍦嗘鍒囧彛璐规爣鍑?,type:'other',mat:'桅110-桅150',spec:'鑼冨洿鍐?,price:'鈥?,fee:'3/浠?,note:''},
+    {cat:'鍦嗘鍒囧彛璐规爣鍑?,type:'other',mat:'桅160-桅210',spec:'鑼冨洿鍐?,price:'鈥?,fee:'5/浠?,note:''},
+    {cat:'鍦嗘鍒囧彛璐规爣鍑?,type:'other',mat:'桅220-桅250',spec:'鑼冨洿鍐?,price:'鈥?,fee:'8/浠?,note:''},
+    {cat:'鍦嗘鍒囧彛璐规爣鍑?,type:'other',mat:'桅260-桅300',spec:'鑼冨洿鍐?,price:'鈥?,fee:'10/浠?,note:''},
+    {cat:'鍦嗘鍒囧彛璐规爣鍑?,type:'other',mat:'桅310-桅400',spec:'鑼冨洿鍐?,price:'鈥?,fee:'20/浠?,note:''},
+    {cat:'鍦嗘鍒囧彛璐规爣鍑?,type:'other',mat:'桅410-桅500',spec:'鑼冨洿鍐?,price:'鈥?,fee:'30/浠?,note:''},
+  ],
+};
+
+const SHEET_KEYS = ['thick','thin','bar','cutFee'];
+const SHEET_NAMES = ['馃搵 涓帤鏉?,'馃搻 钖勬澘','鈿?鍦嗘','鉁傦笍 鍒囧彛璐规爣鍑?];
+
+// 鈹€鈹€鈹€ STORAGE 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+function loadData() {
+  const saved = localStorage.getItem('steel_price_data');
+  if (saved) { try { return JSON.parse(saved); } catch(e){} }
+  return JSON.parse(JSON.stringify(INITIAL_DATA));
+}
+function saveData() { localStorage.setItem('steel_price_data', JSON.stringify(data)); }
+
+let data = loadData();
+let currentSheet = 0;
+let searchTerm = '';
+let adminMode = false;
+
+// 鈹€鈹€鈹€ RENDER 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+function badge(type) {
+  return `<span class="badge badge-${type}">${TYPE_LABELS[type]||type}</span>`;
+}
+function priceCls(p) { const n=parseFloat(p); if(isNaN(n)) return ''; if(n>=15) return 'high'; if(n>=8) return 'mid'; return 'low'; }
+
+function renderStats(items) {
+  const ps = items.map(i=>parseFloat(i.price)).filter(n=>!isNaN(n));
+  if(!ps.length) return '';
+  return ['鏉＄洰:'+items.length, '鍒嗙被:'+new Set(items.map(i=>i.cat)).size,
+    '鏈€浣?楼'+Math.min(...ps).toFixed(1), '鏈€楂?楼'+Math.max(...ps).toFixed(1),
+    '鍧囦环:楼'+(ps.reduce((a,b)=>a+b,0)/ps.length).toFixed(1)
+  ].map(s=>'<div class="stat"><div class="n">'+s.split(':')[1]+'</div><div class="l">'+s.split(':')[0]+'</div></div>').join('');
+}
+
+function renderSheet(items, key) {
+  if(!items.length) return '<div class="no-result">鏈壘鍒板尮閰嶉」</div>';
+  const showFee = key !== 'cutFee' && document.getElementById('chkShowFee')?.checked;
+  const groups = {};
+  items.forEach(i => { if(!groups[i.cat]) groups[i.cat]=[]; groups[i.cat].push(i); });
+
+  let html='';
+  for(const [cat, rows] of Object.entries(groups)) {
+    const t = rows[0].type;
+    html += '<div class="cat"><div class="cat-head on" onclick="this.classList.toggle(\'on\');this.nextElementSibling.classList.toggle(\'on\')">';
+    html += `<div class="cat-dot" style="background:${dotColor(t)}"></div><span class="cat-name">${cat}</span>`;
+    html += `<span class="cat-count">${rows.length}椤?/span><span class="cat-arrow">鈻?/span></div>`;
+    html += '<div class="cat-body on"><div class="tbl-wrap"><table class="tbl">';
+    html += '<tr><th>鏉愯川鐗屽彿</th><th>瑙勬牸</th><th>鍗曚环 (鍏?KG)</th>';
+    if(showFee) html += '<th>鍒囧彛璐?/th>';
+    html += '<th>澶囨敞</th>';
+    if(adminMode) html += '<th>鎿嶄綔</th>';
+    html += '</tr>';
+
+    rows.forEach((r,i) => {
+      const idx = items.indexOf(r);
+      html += `<tr>
+        <td class="mat">${badge(r.type)}${r.mat}</td>
+        <td class="spec">${r.spec}</td>
+        <td class="price ${priceCls(r.price)}">${r.price==='鈥?||r.price==='寰呭畾'?r.price:'楼'+r.price}</td>
+        ${showFee?`<td class="fee">${r.fee}</td>`:''}
+        <td class="spec">${r.note}</td>`;
+      if(adminMode) html += `<td class="act">
+        <button class="btn btn-outline btn-sm" onclick="editItem('${key}',${idx})">鉁忥笍</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('${key}',${idx})">馃棏</button></td>`;
+      html += '</tr>';
+    });
+    html += '</table></div></div></div>';
+  }
+  return html;
+}
+
+function dotColor(type) {
+  const m={carbon:'--blue',quality:'--teal',alloy:'--amber',stainless:'--slate',spring:'--purple',tool:'--red',hsla:'--green',nickel:'--indigo',other:'--rose'};
+  return getComputedStyle(document.documentElement).getPropertyValue(m[type]||m.other).trim();
+}
+
+function filter(items, term) {
+  if(!term) return items;
+  const t=term.toLowerCase();
+  return items.filter(i=>Object.values(i).some(v=>String(v).toLowerCase().includes(t)));
+}
+
+function doRender() {
+  const key = SHEET_KEYS[currentSheet];
+  const items = filter(data[key], searchTerm);
+  document.getElementById('stats').innerHTML = renderStats(items);
+  document.getElementById('content').innerHTML = renderSheet(items, key);
+  document.getElementById('contactBar').innerHTML = currentSheet < 3 ?
+    '馃摓 鎺ュ崟: 鍑屽皬濮?153-7770-9780 | 鏉庡皬濮?133-2685-2517 | 鎶曡瘔鍜ㄨ: 鏂圭敓 15322822777(寰俊鍚屾)<br>鈿狅笍 浠ヤ笂鍗曚环涓嶅惈绋?鍚◣梅0.9 | 浜ゆ湡鎬ュ崟璇蜂笌寮€鍗曞崗鍟?| 姣涙枡鍙悊绠?鍘氬害+3/+5 闀垮+5' :
+    '鈿狅笍 鍒囧彛璐癸細200鐩村緞浠ヤ笅闀垮害鈮?0mm鍏嶈垂锛?00浠ヤ笂闀垮害鈮?00mm鍏嶈垂锛?00浠ヤ笂鍏ㄥ惈锛涜皟璐у叏鍚?;
+}
+
+// 鈹€鈹€鈹€ CRUD 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+function editItem(key, idx) {
+  const item = data[key][idx];
+  document.getElementById('modalTitle').textContent = '缂栬緫鏉＄洰';
+  document.getElementById('fId').value = idx;
+  document.getElementById('fSheet').value = key;
+  document.getElementById('fCat').value = item.cat;
+  document.getElementById('fMat').value = item.mat;
+  document.getElementById('fSpec').value = item.spec;
+  document.getElementById('fPrice').value = item.price;
+  document.getElementById('fFee').value = item.fee;
+  document.getElementById('fNote').value = item.note;
+  document.getElementById('fType').value = item.type;
+  document.getElementById('modal').classList.add('on');
+}
+
+function addNewItem() {
+  const key = SHEET_KEYS[currentSheet];
+  document.getElementById('modalTitle').textContent = '鏂板鏉＄洰';
+  document.getElementById('fId').value = -1;
+  document.getElementById('fSheet').value = key;
+  ['fCat','fMat','fSpec','fPrice','fFee','fNote'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fType').value = 'carbon';
+  document.getElementById('modal').classList.add('on');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('on'); }
+
+function saveItem(e) {
+  e.preventDefault();
+  const key = document.getElementById('fSheet').value;
+  const idx = parseInt(document.getElementById('fId').value);
+  const item = {
+    cat: document.getElementById('fCat').value.trim(),
+    type: document.getElementById('fType').value,
+    mat: document.getElementById('fMat').value.trim(),
+    spec: document.getElementById('fSpec').value.trim(),
+    price: document.getElementById('fPrice').value.trim()||'鈥?,
+    fee: document.getElementById('fFee').value.trim()||'鈥?,
+    note: document.getElementById('fNote').value.trim(),
+  };
+  if(idx >= 0) data[key][idx] = item;
+  else data[key].push(item);
+  saveData(); closeModal(); doRender();
+  toast(idx >= 0 ? '宸叉洿鏂? : '宸叉坊鍔?);
+}
+
+function deleteItem(key, idx) {
+  if(!confirm('纭畾鍒犻櫎姝ゆ潯鐩紵\n\n' + data[key][idx].mat + ' ' + data[key][idx].spec)) return;
+  data[key].splice(idx, 1);
+  saveData(); doRender();
+  toast('宸插垹闄?);
+}
+
+// 鈹€鈹€鈹€ EXPORT / IMPORT / RESET 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+document.getElementById('btnExport').onclick = function() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'steel-price-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); toast('澶囦唤宸蹭笅杞?);
+};
+
+function importData(e) {
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if(!d.thick||!d.thin||!d.bar) throw new Error('鏍煎紡涓嶅');
+      data = d; saveData(); doRender(); toast('鎭㈠鎴愬姛锛?);
+    } catch(ex) { toast('鏂囦欢鏍煎紡閿欒'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+document.getElementById('btnReset').onclick = function() {
+  if(!confirm('纭畾鎭㈠涓哄垵濮嬫暟鎹紵鎵€鏈変慨鏀瑰皢涓㈠け锛?)) return;
+  data = JSON.parse(JSON.stringify(INITIAL_DATA));
+  saveData(); doRender(); toast('宸叉仮澶嶅垵濮嬫暟鎹?);
+};
+
+// 鈹€鈹€鈹€ ADMIN TOGGLE 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+document.getElementById('btnAdmin').onclick = function() {
+  adminMode = !adminMode;
+  this.textContent = adminMode ? '馃敁 閫€鍑虹紪杈? : '馃敀 缂栬緫妯″紡';
+  this.style.background = adminMode ? 'var(--danger)' : 'var(--slate)';
+  document.getElementById('adminBar').classList.toggle('on', adminMode);
+  doRender();
+};
+
+// 鈹€鈹€鈹€ SEARCH & TABS 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+document.getElementById('search').addEventListener('input', function(e) {
+  searchTerm = e.target.value; doRender();
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+    currentSheet = parseInt(this.dataset.s);
+    doRender();
+  });
+});
+
+// 鈹€鈹€鈹€ TOAST 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('on');
+  setTimeout(()=>el.classList.remove('on'), 2000);
+}
+
+// 鈹€鈹€鈹€ MODAL CLICK OUTSIDE 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+document.getElementById('modal').addEventListener('click', function(e) {
+  if(e.target === this) closeModal();
+});
+
+// Initial
+doRender();
+document.getElementById('chkShowFee').onchange = doRender;
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>财晟特殊钢 · 批发价格表</title>
 <style>
